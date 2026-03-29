@@ -44,7 +44,23 @@ export const metadata: Metadata = {
   description:
     "Fresh sourdough, cakes, and treats from VISO. Order via WhatsApp.",
   icons: {
-    apple: publicAsset("/viso-logo.jpg"),
+    icon: [
+      {
+        url: publicAsset("/favicon-16x16.png"),
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: publicAsset("/favicon-32x32.png"),
+        sizes: "32x32",
+        type: "image/png",
+      },
+    ],
+    apple: {
+      url: publicAsset("/apple-touch-icon.png"),
+      sizes: "180x180",
+      type: "image/png",
+    },
   },
   appleWebApp: {
     capable: true,
@@ -58,10 +74,10 @@ export const metadata: Metadata = {
     siteName: "VISO Bakery",
     images: [
       {
-        url: `${canonicalBase}/viso-logo.jpg`,
+        url: `${canonicalBase}/android-chrome-512x512.png`,
         width: 512,
         height: 512,
-        alt: "VISO",
+        alt: "VISO Bakery",
       },
     ],
   },

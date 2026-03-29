@@ -4,7 +4,8 @@ import { publicAsset } from "@/lib/basePath";
 export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
-  const icon = publicAsset("/viso-logo.jpg");
+  const icon192 = publicAsset("/android-chrome-192x192.png");
+  const icon512 = publicAsset("/android-chrome-512x512.png");
   return {
     name: "VISO Bakery",
     short_name: "VISO",
@@ -17,15 +18,21 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "en",
     icons: [
       {
-        src: icon,
-        sizes: "512x512",
-        type: "image/jpeg",
+        src: icon192,
+        sizes: "192x192",
+        type: "image/png",
         purpose: "any",
       },
       {
-        src: icon,
+        src: icon512,
         sizes: "512x512",
-        type: "image/jpeg",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: icon512,
+        sizes: "512x512",
+        type: "image/png",
         purpose: "maskable",
       },
     ],

@@ -1,0 +1,21 @@
+{
+  "name": "VISO Bakery",
+  "short_name": "VISO",
+  "description": "Home bakery — fresh sourdough, cakes, and treats.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#d4eaea",
+  "theme_color": "#ff4610",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
