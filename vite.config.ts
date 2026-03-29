@@ -4,12 +4,14 @@ import { defineConfig } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: ".",
-  // Set VITE_BASE=/YourRepoName/ when building for GitHub Pages project sites (e.g. /VISO/).
-  // Omit locally so `npm run dev` stays at the site root.
-  base: process.env.VITE_BASE ?? "/",
+  // Relative base in production so assets work on GitHub Pages project URLs
+  // (e.g. cowebslb.github.io/VISO/) without hard-coding the repo name.
+  base: command === "build" ? "./" : "/",
   build: {
+    outDir: "docs",
+    emptyOutDir: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
@@ -18,4 +20,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
