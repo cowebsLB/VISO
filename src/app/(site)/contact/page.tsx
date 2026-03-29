@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function ContactPage() {
   const { messages } = useLocale();
   const t = messages.contact;
-  const wa = process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "9610000000";
+  const wa = process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "96171408822";
   const mailto = "mailto:hello@viso-bakery.example.com?subject=VISO%20inquiry";
 
   return (

@@ -34,7 +34,7 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: /VISO
           NEXT_PUBLIC_SITE_URL: https://cowebslb.github.io/VISO
-          NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER: ${{ vars.WHATSAPP_ORDER_NUMBER }}
+          NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER: ${{ secrets.WHATSAPP_ORDER_NUMBER }}
         run: npm run build
 
       - name: Upload artifact

@@ -18,7 +18,7 @@ npm install
 Copy `.env.example` to `.env.local` and set your WhatsApp number:
 
 ```env
-NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER=96171234567
+NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER=96171408822
 ```
 
 Use **digits only** (country code + number, no `+`). This is used for `wa.me` links from checkout.
@@ -45,7 +45,7 @@ Use **digits only** (country code + number, no `+`). This is used for `wa.me` li
 ## Deploy
 
 - **Vercel / Node host:** connect the repo and set `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
-- **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Optionally set repository variable `WHATSAPP_ORDER_NUMBER` for the build.
+- **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Add a **repository secret** `WHATSAPP_ORDER_NUMBER` (digits only, e.g. `96171408822`) so the deployed build gets `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
 
 ## Project structure (high level)
 

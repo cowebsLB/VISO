@@ -5,6 +5,9 @@ import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
 import Link from "next/link";
 
+const waDigits =
+  process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "96171408822";
+
 const social = [
   {
     key: "socialInstagram",
@@ -14,7 +17,7 @@ const social = [
   { key: "socialFacebook", href: "https://www.facebook.com/", icon: "fb" },
   {
     key: "socialWhatsApp",
-    href: "https://wa.me/",
+    href: `https://wa.me/${waDigits}`,
     icon: "wa",
   },
 ] as const;

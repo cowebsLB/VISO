@@ -20,7 +20,7 @@ export default function CheckoutPage() {
   const [when, setWhen] = useState("");
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
 
-  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "9610000000";
+  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "96171408822";
 
   const message = useMemo(() => {
     const header = `${t.orderPrefix} (${locale.toUpperCase()})\n`;
