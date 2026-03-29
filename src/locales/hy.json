@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "home": { "title": "VISO — Տնային հացաբուլկեղ", "description": "Թարմ սուրճով հաց, տորթեր և քաղցրավենիքներ VISO-ից։ Պատվիրեք WhatsApp-ով։" },
+    "catalog": { "title": "Մենյու — VISO", "description": "Դիտեք մեր փոքր խմբաքանակով թխվածքների մենյուն։ Ավելացրեք զամբյուղ և պատվիրեք WhatsApp-ով։" },
+    "cart": { "title": "Զամբյուղ — VISO", "description": "Ստուգեք պատվերը վճարմանից առաջ։" },
+    "checkout": { "title": "Վճարում — VISO", "description": "Ուղարկեք պատվերը VISO-ին WhatsApp-ով։" },
+    "contact": { "title": "Կապ — VISO", "description": "Ժամեր, հասցե և կապ VISO հացաբուլկեղի հետ։" }
+  },
+  "nav": {
+    "home": "Գլխավոր",
+    "catalog": "Մենյու",
+    "cart": "Զամբյուղ",
+    "contact": "Կապ",
+    "openMenu": "Բացել մենյուն",
+    "closeMenu": "Փակել մենյուն",
+    "skip": "Անցնել բովանդակությանը"
+  },
+  "home": {
+    "heroTitle": "Փոքր խմբաքանակներ։ Մեծ համ։",
+    "heroSubtitle": "Տնային թխվածքներ՝ հոգատարությամբ — սուրճով հաց, տորթեր, թխվածքաբլիթներ և սեզոնային առաջարկներ։",
+    "ctaCatalog": "Դիտել մենյուն",
+    "ctaContact": "Կապ մեզ հետ",
+    "aboutTitle": "VISO-ի մասին",
+    "aboutBody": "Մենք տնային հացաբուլկեղ ենք՝ որակյալ բաղադրիչներով և անկեղծ համերով։ Ամեն ինչ պատրաստվում է փոքր խմբաքանակներով — պատվիրեք նախապես, և մենք կպատրաստենք վերցման համար։",
+    "featuredTitle": "Ընտրանի քաղցրավենիքներ",
+    "featuredCta": "Ամբողջ մենյուն",
+    "trustFresh": "Թխվում է պատվերով",
+    "trustPickup": "Տեղական վերցում",
+    "trustCustom": "Անհատական պատվերներ՝ ողջունելի են"
+  },
+  "catalog": {
+    "title": "Մեր մենյուն",
+    "subtitle": "Գները ցուցանիշային են — վերջնական գումարը հաստատվում է WhatsApp-ում։ Ավելացրեք ապրանքները, ապա ավարտեք պատվերը։",
+    "addToCart": "Ավելացնել զամբյուղ",
+    "inCart": "Զամբյուղում",
+    "price": "Գին",
+    "filterAll": "Բոլորը",
+    "filterCakes": "Տորթեր",
+    "filterCupcakes": "Կապքեյքներ",
+    "filterCookies": "Թխվածքաբլիթներ",
+    "filterBread": "Հաց",
+    "filterSeasonal": "Սեզոնային"
+  },
+  "cart": {
+    "title": "Ձեր զամբյուղը",
+    "empty": "Զամբյուղը դատարկ է։",
+    "browse": "Դիտել մենյուն",
+    "subtotal": "Ենթահամար",
+    "remove": "Հեռացնել",
+    "qty": "Քանակ",
+    "proceed": "Անցնել վճարման",
+    "lineTotal": "Գումար"
+  },
+  "checkout": {
+    "title": "Վճարում",
+    "summary": "Պատվերի ամփոփում",
+    "name": "Անուն",
+    "phone": "Հեռախոս (WhatsApp)",
+    "notes": "Վերցման նշումներ",
+    "when": "Նախընտրելի օր / ժամ",
+    "sendWhatsApp": "Ուղարկել պատվերը WhatsApp-ով",
+    "editCart": "Խմբագրել զամբյուղը",
+    "phoneRequired": "Հեռախոսը պարտադիր է։",
+    "nameRequired": "Անունը պարտադիր է։",
+    "emptyCart": "Զամբյուղը դատարկ է — ավելացրեք ապրանքներ մենյուից։",
+    "orderPrefix": "Նոր պատվեր VISO կայքից",
+    "orderThanks": "Շնորհակալություն։"
+  },
+  "contact": {
+    "title": "Կապ",
+    "hours": "Ժամեր",
+    "hoursValue": "Չր–Կիր · 9:00–18:00",
+    "phone": "Հեռախոս",
+    "email": "Էլ․ փոստ",
+    "map": "Բացել Google Maps-ում",
+    "formMessage": "Հաղորդագրություն",
+    "formHint": "Գրեք մեզ էլ․ փոստով (բացում է փոստի ծրագիրը)։",
+    "formSend": "Ուղարկել նամակ",
+    "whatsappCta": "Գրել WhatsApp-ում"
+  },
+  "footer": {
+    "tagline": "Տնային պատրաստված սիրով։",
+    "rights": "Բոլոր իրավունքները պաշտպանված են։",
+    "socialInstagram": "Instagram",
+    "socialFacebook": "Facebook",
+    "socialWhatsApp": "WhatsApp"
+  },
+  "common": {
+    "currency": "USD",
+    "localeLabel": "Լեզու"
+  }
+}

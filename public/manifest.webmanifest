@@ -1,0 +1,24 @@
+{
+  "name": "VISO Bakery",
+  "short_name": "VISO",
+  "description": "Home bakery — fresh sourdough, cakes, and treats. Order via WhatsApp.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#d4eaea",
+  "theme_color": "#ff4610",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/viso-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/viso-logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ]
+}

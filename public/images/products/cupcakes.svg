@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300" role="img" aria-hidden="true">
+  <rect width="400" height="300" fill="#d4eaea"/>
+  <g transform="translate(60,100)"><rect x="0" y="40" width="60" height="50" rx="4" fill="#ff4610"/><ellipse cx="30" cy="40" rx="35" ry="25" fill="#ffe4d9"/></g>
+  <g transform="translate(170,100)"><rect x="0" y="40" width="60" height="50" rx="4" fill="#ff4610"/><ellipse cx="30" cy="40" rx="35" ry="25" fill="#ffe4d9"/></g>
+  <g transform="translate(280,100)"><rect x="0" y="40" width="60" height="50" rx="4" fill="#ff4610"/><ellipse cx="30" cy="40" rx="35" ry="25" fill="#ffe4d9"/></g>
+</svg>

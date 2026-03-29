@@ -1,48 +1,56 @@
-# VISO
+# VISO — home bakery site
 
-Small catalog site for the VISO home bakery: **Home**, **Catalog**, and **Contact**.
+Static Next.js site for a small bakery: **menu**, **cart**, **checkout** (WhatsApp prefilled message), **trilingual** UI (English / Arabic / Armenian), **PWA** (Serwist), and **Tailwind** + custom CSS motion.
 
-## Stack
+## Tech stack
 
-- HTML pages + [Vite](https://vitejs.dev/) for dev and bundling  
-- [Tailwind CSS](https://tailwindcss.com/) (theme: `#ff4610` brand, `#d4eaea` surface)  
-- TypeScript in `src/main.ts` (scroll reveals, nav state, card tilt, magnetic buttons, contact form acknowledgment)
+- **Next.js 15** (App Router), **React 19**, **TypeScript**
+- **Tailwind CSS** + `src/app/globals.css` keyframes
+- **Serwist** service worker (`src/app/sw.ts` → `public/sw.js` on build)
+- **next/image** for logo and product art
 
-## Commands
+## Setup
 
 ```bash
 npm install
-npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`). Use the nav between `index.html`, `catalog.html`, and `contact.html`.
+Copy `.env.example` to `.env.local` and set your WhatsApp number:
 
-```bash
-npm run build
+```env
+NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER=96171234567
 ```
 
-After `npm run build`, the **compiled** site (HTML + CSS + JS) is written to the **`docs/`** folder. Tailwind is bundled into the CSS file there. The repo root HTML is only for development — **GitHub Pages must serve `docs/`, not the root.**
+Use **digits only** (country code + number, no `+`). This is used for `wa.me` links from checkout.
 
-### GitHub Pages (choose one)
+## Scripts
 
-**A — Deploy from branch (simplest, no Actions required)**  
-1. Run `npm run build` before each release (or we commit `docs/` so it stays in sync).  
-2. **Settings → Pages → Build and deployment → Source:** **Deploy from a branch**.  
-3. Branch: **`main`**, folder: **`/docs`** (not “/ (root)”).  
-4. Save. After a minute, open `https://<user>.github.io/<repo>/` (e.g. `…/VISO/`).
+| Command | Description |
+|--------|-------------|
+| `npm run dev` | Dev server (Turbopack, no service worker) |
+| `npm run build` | Production build + `public/sw.js` |
+| `npm run start` | Run production server |
+| `npm run lint` | ESLint |
 
-**B — GitHub Actions**  
-1. **Settings → Pages → Source:** **GitHub Actions**.  
-2. Pushes to `main` run `.github/workflows/deploy-pages.yml`, which builds and publishes the `docs/` output.
+## Assets
 
-If you use **root** (`/`) as the Pages folder, the live site will keep showing unstyled HTML and `/src/main.ts` — that is the wrong folder.
+- **Logo:** `public/viso-logo.jpg` (copied from your original asset; replace with a square PNG/JPEG if you want cleaner PWA icons).
+- **Product images:** SVG placeholders under `public/images/products/`. Swap paths in `src/data/products.ts` and add files under `public/` as needed.
 
-## Before launch
+## PWA
 
-- Set `link rel="canonical"` and `og:*` URLs in each HTML file to your real domain (currently `https://example.com/...`).  
-- Update footer social links (Instagram, Facebook, WhatsApp) and `mailto:` on the contact page.  
-- Wire the contact form to your backend or form service if you need real submissions (the UI shows a thank-you message only).
+- Manifest: `public/manifest.webmanifest`
+- After `npm run build`, `public/sw.js` is generated (Serwist). It is listed in `.gitignore`; regenerate on each deploy.
 
-## Optional logo
+## Deploy
 
-Add your logo under `assets/logo/` and reference it from the header if you want an image next to the wordmark.
+- **Vercel / Node host:** connect the repo and set `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
+- **Static export:** not configured by default; Serwist + `next/image` require a Node-compatible host for full behavior.
+
+## Project structure (high level)
+
+- `src/app/(site)/` — routes: `/`, `/catalog`, `/cart`, `/checkout`, `/contact`
+- `src/contexts/` — `LocaleProvider`, `CartProvider`
+- `src/locales/` — `en.json`, `ar.json`, `hy.json`
+- `src/data/products.ts` — catalog + prices
+- `src/lib/` — cart helpers, WhatsApp URL builder

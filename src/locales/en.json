@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "home": { "title": "VISO — Home bakery", "description": "Fresh sourdough, cakes, and treats from VISO. Order via WhatsApp." },
+    "catalog": { "title": "Menu — VISO", "description": "Browse our small-batch bakery menu. Add to cart and order on WhatsApp." },
+    "cart": { "title": "Your cart — VISO", "description": "Review your order before checkout." },
+    "checkout": { "title": "Checkout — VISO", "description": "Send your order to VISO on WhatsApp." },
+    "contact": { "title": "Contact — VISO", "description": "Hours, location, and how to reach VISO bakery." }
+  },
+  "nav": {
+    "home": "Home",
+    "catalog": "Menu",
+    "cart": "Cart",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "skip": "Skip to main content"
+  },
+  "home": {
+    "heroTitle": "Small batches. Big flavor.",
+    "heroSubtitle": "Home bakery treats baked with care — sourdough, cakes, cookies, and seasonal specials.",
+    "ctaCatalog": "View menu",
+    "ctaContact": "Contact us",
+    "aboutTitle": "About VISO",
+    "aboutBody": "We’re a home bakery focused on quality ingredients and honest flavors. Everything is made in small batches — order ahead and we’ll prepare your pickup.",
+    "featuredTitle": "Featured treats",
+    "featuredCta": "See full menu",
+    "trustFresh": "Baked fresh to order",
+    "trustPickup": "Local pickup",
+    "trustCustom": "Custom orders welcome"
+  },
+  "catalog": {
+    "title": "Our menu",
+    "subtitle": "Prices are indicative — final total is confirmed on WhatsApp. Add items to your cart, then checkout to send your order.",
+    "addToCart": "Add to cart",
+    "inCart": "In cart",
+    "price": "Price",
+    "filterAll": "All",
+    "filterCakes": "Cakes",
+    "filterCupcakes": "Cupcakes",
+    "filterCookies": "Cookies",
+    "filterBread": "Bread",
+    "filterSeasonal": "Seasonal"
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty.",
+    "browse": "Browse the menu",
+    "subtotal": "Subtotal",
+    "remove": "Remove",
+    "qty": "Qty",
+    "proceed": "Proceed to checkout",
+    "lineTotal": "Line total"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summary": "Order summary",
+    "name": "Your name",
+    "phone": "Phone (WhatsApp)",
+    "notes": "Pickup notes",
+    "when": "Preferred day / time",
+    "sendWhatsApp": "Send order on WhatsApp",
+    "editCart": "Edit cart",
+    "phoneRequired": "Phone is required.",
+    "nameRequired": "Name is required.",
+    "emptyCart": "Your cart is empty — add items from the menu.",
+    "orderPrefix": "New order from VISO site",
+    "orderThanks": "Thank you!"
+  },
+  "contact": {
+    "title": "Contact",
+    "hours": "Hours",
+    "hoursValue": "Wed–Sun · 9:00–18:00",
+    "phone": "Phone",
+    "email": "Email",
+    "map": "Open in Google Maps",
+    "formMessage": "Message",
+    "formHint": "Send us a note via email (opens your mail app).",
+    "formSend": "Send email",
+    "whatsappCta": "Message on WhatsApp"
+  },
+  "footer": {
+    "tagline": "Homemade with love.",
+    "rights": "All rights reserved.",
+    "socialInstagram": "Instagram",
+    "socialFacebook": "Facebook",
+    "socialWhatsApp": "WhatsApp"
+  },
+  "common": {
+    "currency": "USD",
+    "localeLabel": "Language"
+  }
+}

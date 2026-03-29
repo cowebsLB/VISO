@@ -1,0 +1,43 @@
+export const CART_STORAGE_KEY = "viso-cart";
+export const CART_VERSION = 1 as const;
+
+export type CartLine = {
+  productId: string;
+  qty: number;
+  title: string;
+  unitPrice: number;
+};
+
+export type CartState = {
+  v: typeof CART_VERSION;
+  lines: CartLine[];
+};
+
+export function emptyCart(): CartState {
+  return { v: CART_VERSION, lines: [] };
+}
+
+export function parseCart(raw: string | null): CartState {
+  if (!raw) return emptyCart();
+  try {
+    const data = JSON.parse(raw) as CartState;
+    if (data.v !== CART_VERSION || !Array.isArray(data.lines)) return emptyCart();
+    return data;
+  } catch {
+    return emptyCart();
+  }
+}
+
+export function cartLineTotal(line: CartLine): number {
+  return Math.round(line.unitPrice * line.qty * 100) / 100;
+}
+
+export function cartSubtotal(lines: CartLine[]): number {
+  return (
+    Math.round(lines.reduce((s, l) => s + cartLineTotal(l), 0) * 100) / 100
+  );
+}
+
+export function cartItemCount(lines: CartLine[]): number {
+  return lines.reduce((n, l) => n + l.qty, 0);
+}
