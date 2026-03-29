@@ -3,6 +3,7 @@
 import { useLocale } from "@/contexts/LocaleContext";
 import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
+import { FooterChibiPeek } from "@/components/FooterChibiPeek";
 import Link from "next/link";
 
 const waDigits =
@@ -90,6 +91,7 @@ export function Footer() {
           © {new Date().getFullYear()} VISO. {f.rights}
         </p>
       </div>
+      <FooterChibiPeek />
     </footer>
   );
 }
