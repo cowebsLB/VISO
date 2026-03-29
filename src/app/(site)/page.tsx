@@ -2,6 +2,7 @@
 
 import { useLocale } from "@/contexts/LocaleContext";
 import { products } from "@/data/products";
+import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -40,7 +41,7 @@ export default function HomePage() {
               <div className="absolute inset-0 rounded-3xl bg-white shadow-card ring-1 ring-primary/10" />
               <div className="relative h-full w-full p-6">
                 <Image
-                  src="/viso-logo.jpg"
+                  src={publicAsset("/viso-logo.jpg")}
                   alt="VISO logo"
                   fill
                   className="rounded-2xl object-contain p-4"
@@ -84,7 +85,7 @@ export default function HomePage() {
               >
                 <div className="relative aspect-[4/3] bg-surface">
                   <Image
-                    src={p.image}
+                    src={publicAsset(p.image)}
                     alt=""
                     fill
                     className="object-cover transition duration-300 group-hover:scale-[1.03]"

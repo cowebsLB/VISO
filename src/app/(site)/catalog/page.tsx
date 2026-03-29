@@ -8,6 +8,7 @@ import {
   type ProductCategory,
   products,
 } from "@/data/products";
+import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
@@ -76,7 +77,7 @@ export default function CatalogPage() {
             >
               <div className="relative aspect-[4/3] bg-surface">
                 <Image
-                  src={p.image}
+                  src={publicAsset(p.image)}
                   alt={p.names[locale]}
                   fill
                   className="object-cover"

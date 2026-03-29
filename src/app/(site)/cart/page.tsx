@@ -6,6 +6,7 @@ import { cartLineTotal, cartSubtotal } from "@/lib/cart";
 import Image from "next/image";
 import Link from "next/link";
 import { productById } from "@/data/products";
+import { publicAsset } from "@/lib/basePath";
 
 export default function CartPage() {
   const { messages } = useLocale();
@@ -43,7 +44,7 @@ export default function CartPage() {
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-surface">
                     {p && (
                       <Image
-                        src={p.image}
+                        src={publicAsset(p.image)}
                         alt=""
                         fill
                         className="object-cover"

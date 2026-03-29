@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "@/contexts/LocaleContext";
+import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -29,7 +30,7 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl ring-1 ring-primary/15">
               <Image
-                src="/viso-logo.jpg"
+                src={publicAsset("/viso-logo.jpg")}
                 alt=""
                 fill
                 className="object-cover"

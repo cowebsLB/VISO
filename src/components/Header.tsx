@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { publicAsset } from "@/lib/basePath";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 const nav = [
@@ -61,7 +62,7 @@ export function Header() {
         >
           <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl ring-2 ring-primary/20">
             <Image
-              src="/viso-logo.jpg"
+              src={publicAsset("/viso-logo.jpg")}
               alt="VISO"
               fill
               className="object-cover"

@@ -39,13 +39,13 @@ Use **digits only** (country code + number, no `+`). This is used for `wa.me` li
 
 ## PWA
 
-- Manifest: `public/manifest.webmanifest`
+- Manifest: `src/app/manifest.ts` (paths respect `NEXT_PUBLIC_BASE_PATH` for GitHub Pages).
 - After `npm run build`, `public/sw.js` is generated (Serwist). It is listed in `.gitignore`; regenerate on each deploy.
 
 ## Deploy
 
 - **Vercel / Node host:** connect the repo and set `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
-- **Static export:** not configured by default; Serwist + `next/image` require a Node-compatible host for full behavior.
+- **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Optionally set repository variable `WHATSAPP_ORDER_NUMBER` for the build.
 
 ## Project structure (high level)
 

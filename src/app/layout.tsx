@@ -6,6 +6,7 @@ import {
   Noto_Sans_Armenian,
 } from "next/font/google";
 import type { Metadata, Viewport } from "next";
+import { publicAsset, siteUrl } from "@/lib/basePath";
 import "./globals.css";
 
 const display = Fraunces({
@@ -35,14 +36,15 @@ const sansArmenian = Noto_Sans_Armenian({
   display: "swap",
 });
 
+const canonicalBase = siteUrl.replace(/\/$/, "");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://viso-bakery.example.com"),
+  metadataBase: new URL(`${canonicalBase}/`),
   title: { default: "VISO — Home bakery", template: "%s — VISO" },
   description:
     "Fresh sourdough, cakes, and treats from VISO. Order via WhatsApp.",
-  manifest: "/manifest.webmanifest",
   icons: {
-    apple: "/viso-logo.jpg",
+    apple: publicAsset("/viso-logo.jpg"),
   },
   appleWebApp: {
     capable: true,
@@ -54,7 +56,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "VISO Bakery",
-    images: [{ url: "/viso-logo.jpg", width: 512, height: 512, alt: "VISO" }],
+    images: [
+      {
+        url: `${canonicalBase}/viso-logo.jpg`,
+        width: 512,
+        height: 512,
+        alt: "VISO",
+      },
+    ],
   },
 };
 
