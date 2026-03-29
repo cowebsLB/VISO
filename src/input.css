@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-surface text-brand-900 antialiased;
+  }
+}
+
+[data-tilt] {
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg))
+    rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.12s ease-out;
+}
+
+@layer utilities {
+  .nav-link {
+    @apply relative text-brand-800 transition-colors duration-200 hover:text-brand-600;
+  }
+  .nav-link::after {
+    content: "";
+    @apply absolute bottom-0 left-0 h-0.5 w-0 bg-brand-500 transition-all duration-300 ease-out;
+  }
+  .nav-link:hover::after,
+  .nav-link[aria-current="page"]::after {
+    @apply w-full;
+  }
+  .nav-link[aria-current="page"] {
+    @apply text-brand-600 font-medium;
+  }
+}
