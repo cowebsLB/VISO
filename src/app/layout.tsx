@@ -6,6 +6,7 @@ import {
   Noto_Sans_Armenian,
 } from "next/font/google";
 import type { Metadata, Viewport } from "next";
+import { BRAND_DESCRIPTION, BRAND_NAME, BRAND_SITE_NAME } from "@/lib/brand";
 import { publicAsset, siteUrl } from "@/lib/basePath";
 import "./globals.css";
 
@@ -40,9 +41,11 @@ const canonicalBase = siteUrl.replace(/\/$/, "");
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${canonicalBase}/`),
-  title: { default: "VISO — Home bakery", template: "%s — VISO" },
-  description:
-    "Fresh sourdough, cakes, and treats from VISO. Order via WhatsApp.",
+  title: {
+    default: `${BRAND_NAME} — Home bakery`,
+    template: `%s — ${BRAND_NAME}`,
+  },
+  description: BRAND_DESCRIPTION,
   icons: {
     icon: [
       {
@@ -65,19 +68,19 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "VISO",
+    title: BRAND_NAME,
   },
   formatDetection: { telephone: true },
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "VISO Bakery",
+    siteName: BRAND_SITE_NAME,
     images: [
       {
         url: `${canonicalBase}/android-chrome-512x512.png`,
         width: 512,
         height: 512,
-        alt: "VISO Bakery",
+        alt: BRAND_SITE_NAME,
       },
     ],
   },

@@ -8,7 +8,8 @@ export default function ContactPage() {
   const { messages } = useLocale();
   const t = messages.contact;
   const wa = process.env.NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER ?? "96171408822";
-  const mailto = "mailto:hello@viso-bakery.example.com?subject=VISO%20inquiry";
+  const mailto =
+    "mailto:hello@anushbadar.example.com?subject=Anush%20Badar%20inquiry";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -43,7 +44,7 @@ export default function ContactPage() {
               href={mailto}
               className="mt-1 block text-lg text-primary-700 hover:underline"
             >
-              hello@viso-bakery.example.com
+              hello@anushbadar.example.com
             </a>
           </div>
           <Link
@@ -55,7 +56,7 @@ export default function ContactPage() {
             {t.map}
           </Link>
           <a
-            href={buildWhatsAppUrl(wa, "Hello VISO!")}
+            href={buildWhatsAppUrl(wa, "Hello Anush Badar!")}
             target="_blank"
             rel="noopener noreferrer"
             className="flex w-full items-center justify-center rounded-full bg-[#25D366] py-3 font-semibold text-white shadow-soft transition hover:brightness-105"

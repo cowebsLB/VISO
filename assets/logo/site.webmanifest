@@ -1,7 +1,7 @@
 {
-  "name": "VISO Bakery",
-  "short_name": "VISO",
-  "description": "Home bakery — fresh sourdough, cakes, and treats.",
+  "name": "Anush Badar Bakery",
+  "short_name": "Anush Badar",
+  "description": "Homemade Armenian sweets, sourdough, cakes, and treats.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#d4eaea",

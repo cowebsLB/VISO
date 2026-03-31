@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BRAND_DESCRIPTION, BRAND_NAME, BRAND_SITE_NAME } from "@/lib/brand";
 import { publicAsset } from "@/lib/basePath";
 
 export const dynamic = "force-static";
@@ -7,10 +8,9 @@ export default function manifest(): MetadataRoute.Manifest {
   const icon192 = publicAsset("/android-chrome-192x192.png");
   const icon512 = publicAsset("/android-chrome-512x512.png");
   return {
-    name: "VISO Bakery",
-    short_name: "VISO",
-    description:
-      "Home bakery — fresh sourdough, cakes, and treats. Order via WhatsApp.",
+    name: BRAND_SITE_NAME,
+    short_name: BRAND_NAME,
+    description: BRAND_DESCRIPTION,
     start_url: publicAsset("/"),
     display: "standalone",
     background_color: "#d4eaea",

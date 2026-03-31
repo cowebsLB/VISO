@@ -26,6 +26,7 @@ const social = [
 export function Footer() {
   const { messages } = useLocale();
   const f = messages.footer;
+  const brand = messages.brand;
 
   return (
     <footer className="mt-auto border-t border-primary/15 bg-white/60">
@@ -34,16 +35,16 @@ export function Footer() {
           <div className="flex items-center gap-3">
             <span className="relative h-10 w-10 overflow-hidden rounded-xl ring-1 ring-primary/15">
               <Image
-                src={publicAsset("/viso-logo.jpg")}
+                src={publicAsset("/Logo.png")}
                 alt=""
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="40px"
               />
             </span>
             <div>
               <p className="font-display text-lg font-bold text-primary-600">
-                VISO
+                {brand.name}
               </p>
               <p className="text-sm text-slate-600">{f.tagline}</p>
             </div>
@@ -88,7 +89,7 @@ export function Footer() {
           </div>
         </div>
         <p className="mt-8 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} VISO. {f.rights}
+          © {new Date().getFullYear()} {brand.name}. {f.rights}
         </p>
       </div>
       <FooterChibiPeek />

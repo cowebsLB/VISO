@@ -1,10 +1,14 @@
 {
+  "brand": {
+    "name": "Anush Badar",
+    "logoAlt": "Anush Badar Bakery & Sweets"
+  },
   "meta": {
-    "home": { "title": "VISO — Home bakery", "description": "Fresh sourdough, cakes, and treats from VISO. Order via WhatsApp." },
-    "catalog": { "title": "Menu — VISO", "description": "Browse our small-batch bakery menu. Add to cart and order on WhatsApp." },
-    "cart": { "title": "Your cart — VISO", "description": "Review your order before checkout." },
-    "checkout": { "title": "Checkout — VISO", "description": "Send your order to VISO on WhatsApp." },
-    "contact": { "title": "Contact — VISO", "description": "Hours, location, and how to reach VISO bakery." }
+    "home": { "title": "Anush Badar — Home bakery", "description": "Homemade Armenian sweets, sourdough, cakes, and treats from Anush Badar. Order via WhatsApp." },
+    "catalog": { "title": "Menu — Anush Badar", "description": "Browse our small-batch bakery menu. Add to cart and order on WhatsApp." },
+    "cart": { "title": "Your cart — Anush Badar", "description": "Review your order before checkout." },
+    "checkout": { "title": "Checkout — Anush Badar", "description": "Send your order to Anush Badar on WhatsApp." },
+    "contact": { "title": "Contact — Anush Badar", "description": "Hours, location, and how to reach Anush Badar bakery." }
   },
   "nav": {
     "home": "Home",
@@ -20,7 +24,7 @@
     "heroSubtitle": "Home bakery treats baked with care — sourdough, cakes, cookies, and seasonal specials.",
     "ctaCatalog": "View menu",
     "ctaContact": "Contact us",
-    "aboutTitle": "About VISO",
+    "aboutTitle": "About Anush Badar",
     "aboutBody": "We’re a home bakery focused on quality ingredients and honest flavors. Everything is made in small batches — order ahead and we’ll prepare your pickup.",
     "featuredTitle": "Featured treats",
     "featuredCta": "See full menu",
@@ -63,7 +67,7 @@
     "phoneRequired": "Phone is required.",
     "nameRequired": "Name is required.",
     "emptyCart": "Your cart is empty — add items from the menu.",
-    "orderPrefix": "New order from VISO site",
+    "orderPrefix": "New order from Anush Badar site",
     "orderThanks": "Thank you!"
   },
   "contact": {

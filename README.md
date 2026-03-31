@@ -1,6 +1,6 @@
-# VISO — home bakery site
+# Anush Badar — home bakery site
 
-Static Next.js site for a small bakery: **menu**, **cart**, **checkout** (WhatsApp prefilled message), **trilingual** UI (English / Arabic / Armenian), **PWA** (Serwist), and **Tailwind** + custom CSS motion.
+Static Next.js site for **Anush Badar** (bakery & sweets): **menu**, **cart**, **checkout** (WhatsApp prefilled message), **trilingual** UI (English / Arabic / Armenian), **PWA** (Serwist), and **Tailwind** + custom CSS motion.
 
 ## Tech stack
 
@@ -34,7 +34,7 @@ Use **digits only** (country code + number, no `+`). This is used for `wa.me` li
 
 ## Assets
 
-- **Logo:** `public/viso-logo.jpg` (copied from your original asset; replace with a square PNG/JPEG if you want cleaner PWA icons).
+- **Logo:** `public/Logo.png` (main mark). Favicons: `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-*.png`, `src/app/favicon.ico`.
 - **Product images:** SVG placeholders under `public/images/products/`. Swap paths in `src/data/products.ts` and add files under `public/` as needed.
 
 ## PWA

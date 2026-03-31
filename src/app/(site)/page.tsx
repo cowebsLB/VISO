@@ -9,6 +9,7 @@ import Link from "next/link";
 export default function HomePage() {
   const { locale, messages } = useLocale();
   const h = messages.home;
+  const brand = messages.brand;
   const featured = products.slice(0, 3);
 
   return (
@@ -41,8 +42,8 @@ export default function HomePage() {
               <div className="absolute inset-0 rounded-3xl bg-white shadow-card ring-1 ring-primary/10" />
               <div className="relative h-full w-full p-6">
                 <Image
-                  src={publicAsset("/viso-logo.jpg")}
-                  alt="VISO logo"
+                  src={publicAsset("/Logo.png")}
+                  alt={brand.logoAlt}
                   fill
                   className="rounded-2xl object-contain p-4"
                   sizes="(max-width: 768px) 100vw, 400px"
@@ -64,7 +65,7 @@ export default function HomePage() {
           </div>
           <div className="animate-fade-up rounded-3xl bg-white p-8 shadow-card ring-1 ring-primary/10 delay-100">
             <p className="text-sm font-medium uppercase tracking-wide text-primary-500">
-              VISO
+              {brand.name}
             </p>
             <p className="mt-2 text-slate-600">{h.heroSubtitle}</p>
           </div>

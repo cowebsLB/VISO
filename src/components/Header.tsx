@@ -42,6 +42,7 @@ export function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const m = messages.nav;
+  const brand = messages.brand;
 
   useEffect(() => {
     setOpen(false);
@@ -62,16 +63,16 @@ export function Header() {
         >
           <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl ring-2 ring-primary/20">
             <Image
-              src={publicAsset("/viso-logo.jpg")}
-              alt="VISO"
+              src={publicAsset("/Logo.png")}
+              alt={brand.logoAlt}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="48px"
               priority
             />
           </span>
           <span className="font-display text-xl font-bold text-primary-600">
-            VISO
+            {brand.name}
           </span>
         </Link>
 
