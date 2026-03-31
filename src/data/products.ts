@@ -2,12 +2,17 @@ import type { LocaleCode } from "@/lib/locale";
 
 export type ProductCategory =
   | "cakes"
-  | "cupcakes"
   | "cookies"
-  | "bread"
-  | "seasonal";
+  | "bread";
 
 export type Localized = Record<LocaleCode, string>;
+
+export type ProductOption = {
+  id: string;
+  price: number;
+  names: Localized;
+  descriptions: Localized;
+};
 
 export type Product = {
   id: string;
@@ -16,182 +21,238 @@ export type Product = {
   image: string;
   names: Localized;
   descriptions: Localized;
+  options: ProductOption[];
 };
 
 export const products: Product[] = [
   {
-    id: "sourdough-loaf",
+    id: "kaak",
     category: "bread",
-    price: 6.5,
-    image: "/images/products/bread.svg",
+    price: 15.0,
+    image: "/images/products/plain-kaak.webp",
     names: {
-      en: "Country sourdough loaf",
-      ar: "رغيف خبز مخمر ريفي",
-      hy: "Գյուղական սուրճով հաց",
+      en: "Kaak",
+      ar: "كعك",
+      hy: "Քաաք",
     },
     descriptions: {
-      en: "Slow-fermented with a crackly crust—perfect for breakfast.",
-      ar: "مخمر ببطء مع قشرة مقرمشة—مثالي للفطور.",
-      hy: "Խմորում դանդաղ, խրթին կեղևով՝ հիանալի նախաճաշի համար։",
+      en: "Traditional kaak available with multiple fillings.",
+      ar: "كعك تقليدي متوفر بعدة حشوات.",
+      hy: "Ավանդական քաաք՝ տարբեր միջուկներով։",
     },
+    options: [
+      {
+        id: "salty",
+        price: 15.0,
+        names: {
+          en: "1 KG Salty Kaak",
+          ar: "1 كغ كعك مالح",
+          hy: "1 կգ աղի քաաք",
+        },
+        descriptions: {
+          en: "Classic salty kaak.",
+          ar: "كعك مالح كلاسيكي.",
+          hy: "Դասական աղի քաաք։",
+        },
+      },
+      {
+        id: "sweet",
+        price: 20.0,
+        names: {
+          en: "1 KG Sweet Kaak",
+          ar: "1 كغ كعك حلو",
+          hy: "1 կգ քաղցր քաաք",
+        },
+        descriptions: {
+          en: "Sweet kaak version.",
+          ar: "نسخة الكعك الحلو.",
+          hy: "Քաղցր քաաք տարբերակ։",
+        },
+      },
+      {
+        id: "dates",
+        price: 22.0,
+        names: {
+          en: "1 KG Kaak Dates",
+          ar: "1 كغ كعك بالتمر",
+          hy: "1 կգ քաաք արմավով",
+        },
+        descriptions: {
+          en: "Kaak filled with date paste.",
+          ar: "كعك محشو بمعجون التمر.",
+          hy: "Արմավի միջուկով քաաք։",
+        },
+      },
+    ],
   },
   {
-    id: "chocolate-cake-slice",
-    category: "cakes",
-    price: 5.0,
-    image: "/images/products/cake-chocolate.svg",
-    names: {
-      en: "Chocolate fudge slice",
-      ar: "شريحة كيك شوكولاتة فدج",
-      hy: "Շոկոլադե ֆաժ կտոր",
-    },
-    descriptions: {
-      en: "Rich layers with dark cocoa ganache.",
-      ar: "طبقات غنية مع غاناش كاكاو داكن.",
-      hy: "Համեղ շերտեր մուգ կակաոյի գանաշով։",
-    },
-  },
-  {
-    id: "vanilla-cupcakes-6",
-    category: "cupcakes",
-    price: 18.0,
-    image: "/images/products/cupcakes.svg",
-    names: {
-      en: "Vanilla cupcakes (box of 6)",
-      ar: "كاب كيك فانيليا (علبة 6)",
-      hy: "Վանիլային կապքեյքներ (6 հատ)",
-    },
-    descriptions: {
-      en: "Fluffy sponge with silky buttercream.",
-      ar: "إسفنجة خفيفة مع كريمة زبدة حريرية.",
-      hy: "Փափուկ բիսկվիթ և մետաքսային կրեմ։",
-    },
-  },
-  {
-    id: "almond-croissant",
-    category: "seasonal",
-    price: 4.25,
-    image: "/images/products/croissant.svg",
-    names: {
-      en: "Almond croissant",
-      ar: "كرواسون لوز",
-      hy: "Նուշով կրուասան",
-    },
-    descriptions: {
-      en: "Buttery layers with toasted almond filling.",
-      ar: "طبقات زبدية مع حشوة لوز محمص.",
-      hy: "Կարագային շերտեր ծոտացված նուշով։",
-    },
-  },
-  {
-    id: "lemon-tart",
-    category: "cakes",
-    price: 4.75,
-    image: "/images/products/tart.svg",
-    names: {
-      en: "Lemon tart",
-      ar: "تارت ليمون",
-      hy: "Կիտրոնով տարտ",
-    },
-    descriptions: {
-      en: "Zesty curd in a crisp pastry shell.",
-      ar: "كريمة ليمون لاذعة في عجينة مقرمشة.",
-      hy: "Թարմ կիտրոնի կրեմ խրթին խմորապատյանում։",
-    },
-  },
-  {
-    id: "oat-cookies",
+    id: "maamoul-pistachio",
     category: "cookies",
-    price: 12.0,
-    image: "/images/products/cookies.svg",
-    names: {
-      en: "Oat & raisin cookies (dozen)",
-      ar: "بسكويت الشوفان والزبيب (12 قطعة)",
-      hy: "Բրնձով և չամիչով թխվածքաբլիթներ (12 հատ)",
-    },
-    descriptions: {
-      en: "Chewy, lightly spiced—great with tea.",
-      ar: "مضغي ومتبل قليلاً—رائع مع الشاي.",
-      hy: "Թեթև համեմված, փափուկ՝ թեյի հետ հիանալի։",
-    },
-  },
-  {
-    id: "fruit-danish",
-    category: "seasonal",
-    price: 3.75,
-    image: "/images/products/danish.svg",
-    names: {
-      en: "Seasonal fruit Danish",
-      ar: "دانيش فواكه موسمية",
-      hy: "Սեզոնային մրգային դանիշ",
-    },
-    descriptions: {
-      en: "Pastry cream and fresh fruit on flaky dough.",
-      ar: "كريمة معجنات وفواكه طازجة على عجينة رقيقة.",
-      hy: "Կրեմ և թարմ մրգեր փխրուն խմորի վրա։",
-    },
-  },
-  {
-    id: "carrot-cake-mini",
-    category: "cakes",
     price: 22.0,
-    image: "/images/products/carrot.svg",
+    image: "/images/products/maamoul-pistachio.webp",
     names: {
-      en: "Mini carrot cake (8\")",
-      ar: "كيك جزر صغير (8 بوصة)",
-      hy: "Փոքր գազարով տորթ (8\" )",
+      en: "Maamoul",
+      ar: "معمول",
+      hy: "Մամուլ",
     },
     descriptions: {
-      en: "Spiced layers with cream cheese frosting.",
-      ar: "طبقات متبلة مع تثليج جبن كريمي.",
-      hy: "Կրեմ-չիզ փրոստինգով համեմված շերտեր։",
+      en: "Traditional maamoul with multiple fillings.",
+      ar: "معمول تقليدي بعدة حشوات.",
+      hy: "Ավանդական մամուլ՝ տարբեր միջուկներով։",
     },
+    options: [
+      {
+        id: "dates",
+        price: 22.0,
+        names: {
+          en: "1 KG Maamoul Dates",
+          ar: "1 كغ معمول تمر",
+          hy: "1 կգ մամուլ արմավով",
+        },
+        descriptions: {
+          en: "Maamoul with date filling.",
+          ar: "معمول بحشوة تمر.",
+          hy: "Մամուլ արմավի միջուկով։",
+        },
+      },
+      {
+        id: "pistachio",
+        price: 26.0,
+        names: {
+          en: "1 KG Maamoul Pistachio",
+          ar: "1 كغ معمول فستق",
+          hy: "1 կգ մամուլ պիստակով",
+        },
+        descriptions: {
+          en: "Maamoul with pistachio filling.",
+          ar: "معمول بحشوة فستق.",
+          hy: "Մամուլ պիստակի միջուկով։",
+        },
+      },
+      {
+        id: "walnut",
+        price: 24.0,
+        names: {
+          en: "1 KG Maamoul Walnut",
+          ar: "1 كغ معمول جوز",
+          hy: "1 կգ մամուլ ընկույզով",
+        },
+        descriptions: {
+          en: "Maamoul with walnut filling.",
+          ar: "معمول بحشوة جوز.",
+          hy: "Մամուլ ընկույզի միջուկով։",
+        },
+      },
+    ],
   },
   {
-    id: "sesame-bagel",
+    id: "brioche",
     category: "bread",
-    price: 2.5,
-    image: "/images/products/bagel.svg",
+    price: 22.0,
+    image: "/images/products/brioche.webp",
     names: {
-      en: "Sesame bagel",
-      ar: "بيغل بالسمسم",
-      hy: "Սեսամով բեյգլ",
+      en: "Brioche",
+      ar: "بريوش",
+      hy: "Բրիոշ",
     },
     descriptions: {
-      en: "Boiled-then-baked with a golden crust.",
-      ar: "مسلوق ثم مخبوز بقشرة ذهبية.",
-      hy: "Եփած, հետո թխած՝ ոսկեգույն կեղևով։",
+      en: "Soft and rich brioche with flavor options.",
+      ar: "بريوش طري وغني مع خيارات نكهة.",
+      hy: "Փափուկ և հարուստ բրիոշ՝ տարբերակներով։",
     },
+    options: [
+      {
+        id: "plain",
+        price: 22.0,
+        names: {
+          en: "1 KG Brioche",
+          ar: "1 كغ بريوش",
+          hy: "1 կգ բրիոշ",
+        },
+        descriptions: {
+          en: "Classic plain brioche.",
+          ar: "بريوش سادة كلاسيكي.",
+          hy: "Դասական պարզ բրիոշ։",
+        },
+      },
+      {
+        id: "raisin",
+        price: 24.0,
+        names: {
+          en: "1 KG Brioche Raisin",
+          ar: "1 كغ بريوش زبيب",
+          hy: "1 կգ բրիոշ չամիչով",
+        },
+        descriptions: {
+          en: "Brioche with raisins.",
+          ar: "بريوش مع الزبيب.",
+          hy: "Բրիոշ չամիչով։",
+        },
+      },
+      {
+        id: "chocolate",
+        price: 28.0,
+        names: {
+          en: "1 KG Brioche Chocolate",
+          ar: "1 كغ بريوش شوكولا",
+          hy: "1 կգ շոկոլադե բրիոշ",
+        },
+        descriptions: {
+          en: "Brioche with chocolate filling.",
+          ar: "بريوش بحشوة شوكولا.",
+          hy: "Բրիոշ շոկոլադե միջուկով։",
+        },
+      },
+    ],
   },
   {
-    id: "brownie-box",
-    category: "cookies",
-    price: 16.0,
-    image: "/images/products/brownie.svg",
+    id: "armenian-gata",
+    category: "cakes",
+    price: 30.0,
+    image: "/images/products/armenian-gata.webp",
     names: {
-      en: "Fudge brownie box (9 pcs)",
-      ar: "علبة براوني فدج (9 قطع)",
-      hy: "Ֆաժ բրաունի տուփ (9 հատ)",
+      en: "Armenian Gata",
+      ar: "غاتا أرمينية",
+      hy: "Հայկական գաթա",
     },
     descriptions: {
-      en: "Dense, glossy squares—shareable joy.",
-      ar: "مربعات كثيفة ولامعة—فرحة للمشاركة.",
-      hy: "Խիտ, փայլուն քառակուսիներ՝ կիսելու ուրախությամբ։",
+      en: "Traditional Armenian sweet bread with a rich buttery filling.",
+      ar: "خبز حلو أرمني تقليدي بحشوة زبدية غنية.",
+      hy: "Ավանդական հայկական քաղցր խմորեղեն՝ հարուստ կարագային միջուկով։",
     },
+    options: [
+      {
+        id: "classic",
+        price: 30.0,
+        names: {
+          en: "1 KG Armenian Gata",
+          ar: "1 كغ غاتا أرمينية",
+          hy: "1 կգ հայկական գաթա",
+        },
+        descriptions: {
+          en: "Classic Armenian gata.",
+          ar: "غاتا أرمينية كلاسيكية.",
+          hy: "Դասական հայկական գաթա։",
+        },
+      },
+    ],
   },
 ];
 
 export const categoryKeys = [
   "all",
   "cakes",
-  "cupcakes",
   "cookies",
   "bread",
-  "seasonal",
 ] as const;
 
 export type CategoryFilter = (typeof categoryKeys)[number];
 
 export function productById(id: string): Product | undefined {
   return products.find((p) => p.id === id);
+}
+
+export function productStartingPrice(product: Product): number {
+  if (product.options.length === 0) return product.price;
+  return Math.min(...product.options.map((option) => option.price));
 }

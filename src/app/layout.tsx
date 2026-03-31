@@ -108,6 +108,7 @@ export default function RootLayout({
         ) : null}
       </head>
       <body
+        suppressHydrationWarning
         className={`${display.variable} ${sans.variable} ${sansArabic.variable} ${sansArmenian.variable} min-h-screen bg-surface font-sans text-slate-800 antialiased`}
       >
         <ClientProviders>{children}</ClientProviders>

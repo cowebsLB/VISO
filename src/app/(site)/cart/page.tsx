@@ -35,7 +35,8 @@ export default function CartPage() {
         <>
           <ul className="mt-8 space-y-4">
             {lines.map((line) => {
-              const p = productById(line.productId);
+              const baseProductId = line.productId.split(":")[0];
+              const p = productById(baseProductId);
               return (
                 <li
                   key={line.productId}

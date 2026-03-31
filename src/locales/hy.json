@@ -43,7 +43,12 @@
     "filterCupcakes": "Կապքեյքներ",
     "filterCookies": "Թխվածքաբլիթներ",
     "filterBread": "Հաց",
-    "filterSeasonal": "Սեզոնային"
+    "filterSeasonal": "Սեզոնային",
+    "fromPrice": "Սկսած",
+    "viewDetails": "Տեսնել մանրամասները",
+    "availableOptions": "Հասանելի տարբերակներ",
+    "selectedOption": "Ընտրված տարբերակ",
+    "backToMenu": "Վերադառնալ մենյու"
   },
   "cart": {
     "title": "Ձեր զամբյուղը",
@@ -94,3 +99,4 @@
     "localeLabel": "Լեզու"
   }
 }
+

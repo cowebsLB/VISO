@@ -1,29 +1,27 @@
 "use client";
 
 import { useLocale } from "@/contexts/LocaleContext";
-import { useCart } from "@/contexts/CartContext";
 import {
   categoryKeys,
   type CategoryFilter,
   type ProductCategory,
+  productStartingPrice,
   products,
 } from "@/data/products";
 import { publicAsset } from "@/lib/basePath";
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const filterToCategory: Record<string, ProductCategory | null> = {
+const filterToCategory: Record<CategoryFilter, ProductCategory | null> = {
   all: null,
   cakes: "cakes",
-  cupcakes: "cupcakes",
   cookies: "cookies",
   bread: "bread",
-  seasonal: "seasonal",
 };
 
 export default function CatalogPage() {
   const { locale, messages } = useLocale();
-  const { addLine, lines } = useCart();
   const c = messages.catalog;
   const [filter, setFilter] = useState<CategoryFilter>("all");
 
@@ -32,9 +30,6 @@ export default function CatalogPage() {
     if (!cat) return products;
     return products.filter((p) => p.category === cat);
   }, [filter]);
-
-  const qtyInCart = (id: string) =>
-    lines.find((l) => l.productId === id)?.qty ?? 0;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -59,17 +54,14 @@ export default function CatalogPage() {
           >
             {key === "all" && c.filterAll}
             {key === "cakes" && c.filterCakes}
-            {key === "cupcakes" && c.filterCupcakes}
             {key === "cookies" && c.filterCookies}
             {key === "bread" && c.filterBread}
-            {key === "seasonal" && c.filterSeasonal}
           </button>
         ))}
       </div>
 
       <ul className="mt-12 grid list-none gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((p) => {
-          const inCart = qtyInCart(p.id);
           return (
             <li
               key={p.id}
@@ -92,22 +84,14 @@ export default function CatalogPage() {
                   {p.descriptions[locale]}
                 </p>
                 <p className="mt-3 font-semibold text-primary-600">
-                  {c.price}: ${p.price.toFixed(2)}
+                  {c.fromPrice}: ${productStartingPrice(p).toFixed(2)}
                 </p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    addLine({
-                      productId: p.id,
-                      title: p.names[locale],
-                      unitPrice: p.price,
-                      qty: 1,
-                    })
-                  }
-                  className="mt-4 w-full rounded-xl bg-primary-500 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary-600 active:scale-[0.98]"
+                <Link
+                  href={`/catalog/${p.id}`}
+                  className="mt-4 block w-full rounded-xl bg-primary-500 py-3 text-center text-sm font-semibold text-white shadow-soft transition hover:bg-primary-600 active:scale-[0.98]"
                 >
-                  {inCart > 0 ? `${c.addToCart} (${inCart})` : c.addToCart}
-                </button>
+                  {c.viewDetails}
+                </Link>
               </div>
             </li>
           );

@@ -43,7 +43,12 @@
     "filterCupcakes": "Cupcakes",
     "filterCookies": "Cookies",
     "filterBread": "Bread",
-    "filterSeasonal": "Seasonal"
+    "filterSeasonal": "Seasonal",
+    "fromPrice": "From",
+    "viewDetails": "View details",
+    "availableOptions": "Available options",
+    "selectedOption": "Selected option",
+    "backToMenu": "Back to menu"
   },
   "cart": {
     "title": "Your cart",
@@ -94,3 +99,4 @@
     "localeLabel": "Language"
   }
 }
+

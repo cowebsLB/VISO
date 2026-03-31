@@ -43,7 +43,12 @@
     "filterCupcakes": "كاب كيك",
     "filterCookies": "بسكويت",
     "filterBread": "خبز",
-    "filterSeasonal": "موسمي"
+    "filterSeasonal": "موسمي",
+    "fromPrice": "ابتداءً من",
+    "viewDetails": "عرض التفاصيل",
+    "availableOptions": "الخيارات المتاحة",
+    "selectedOption": "الخيار المحدد",
+    "backToMenu": "العودة إلى القائمة"
   },
   "cart": {
     "title": "سلة التسوق",
@@ -94,3 +99,4 @@
     "localeLabel": "اللغة"
   }
 }
+
