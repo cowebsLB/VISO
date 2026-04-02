@@ -18,7 +18,7 @@ When `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set:
 | Value | Meaning |
 |--------|---------|
 | `/images/products/foo.webp` | File under `public/` (respects `NEXT_PUBLIC_BASE_PATH` on GitHub Pages). |
-| `menu/<uuid>.webp` (or similar) | Object key in your product images bucket (default id **`product-images`**). Public URL: `{NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/{bucket}/{key}`. Override bucket id with **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`** if the Dashboard name differs. |
+| `menu/<uuid>.webp` (or similar) | Object key in your product images bucket (default id **`product-images`**). Public URL: `{NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/{bucket}/{key}`. Override bucket id with **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`** if the Dashboard name differs. Prefer storing **only the key** (e.g. `menu/….webp`), not a pasted URL — URLs without the **`/public/`** segment return **400**. |
 | `https://…` | Used as-is. |
 
 Resolution is implemented in `src/lib/images/product-image-url.ts` (`productImageUrl`).
