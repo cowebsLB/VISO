@@ -38,9 +38,9 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 | `npm run lint` | ESLint |
 | `npm run test:e2e` | Playwright E2E (starts dev server locally unless `CI=1`; run `npx playwright install` once) |
 
-### If you see `500` on `/admin/...` or `/favicon.ico` on **3040**
+### If you see `500` on `/admin/...`, `/favicon.ico`, or `/manifest.webmanifest` on **3040**
 
-Usually a **broken `.next` cache** (missing `routes-manifest.json`, `Cannot find module './NNN.js'`). **Stop** the dev server (Ctrl+C), delete the `.next` folder, then run `npm run dev` again and wait until it says **Ready** before opening the browser. On Windows, avoid deleting `.next` while the server is still running.
+Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`** / similar chunk errors in the terminal). **Stop** the dev server (Ctrl+C), then either delete the `.next` folder manually or run **`npm run clean`**, then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** (Turbopack) or **`npm run dev:webpack:clean`** (Webpack). Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
 
 ### If you see `500` on `http://localhost:3000`
 
