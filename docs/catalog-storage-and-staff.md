@@ -25,6 +25,21 @@ Resolution is implemented in `src/lib/images/product-image-url.ts` (`productImag
 
 **Bucket setup:** Apply migration `20260204120007_storage_product_images.sql` (`supabase db push`). Staff upload from **Admin → Menu** (optional in-browser **WebP** conversion).
 
+### If you created the bucket only in the Dashboard
+
+The bucket id must be exactly **`product-images`** (hyphen, lowercase) unless you set **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`** to match your id.
+
+Turn **Public bucket** on if you want catalog `<img>` URLs to work without signed URLs.
+
+**Important:** The UI does **not** create the **storage.objects** RLS policies the app expects. Without them, uploads fail with errors like *new row violates row-level security policy* or *permission denied*.
+
+1. Supabase → **SQL Editor** → New query.
+2. Paste and run the full contents of **`supabase/migrations/20260204120007_storage_product_images.sql`**.
+
+That script upserts the bucket row (public, MIME allow-list, size limit) and recreates the four policies (public read; admin insert/update/delete). It is safe to run more than once.
+
+**Still failing?** Confirm your login is staff: a row in **`public.admins`** with **`user_id`** = your Auth user UUID (`docs/seed-admins.md`). Confirm **`.env.local`** uses the same project URL and anon key as that Dashboard.
+
 ## Staff verification (`getStaffSupabase`)
 
 Staff must have a row in **`public.admins`** with `user_id` = their Supabase Auth user UUID (`docs/seed-admins.md`).

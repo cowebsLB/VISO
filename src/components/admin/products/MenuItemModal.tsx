@@ -8,6 +8,7 @@ import {
 } from "@/lib/admin/prepare-image-upload";
 import { productImageUrl } from "@/lib/images/product-image-url";
 import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/product-images-bucket";
+import { storageUploadUserHint } from "@/lib/admin/storage-upload-hint";
 import { uniqueSlug } from "@/lib/admin/slugify";
 import { useEffect, useRef, useState } from "react";
 
@@ -204,12 +205,7 @@ export function MenuItemModal({
         upsert: false,
       });
       if (error) {
-        const msg = error.message;
-        onError(
-          msg.includes("Bucket not found") || msg.includes("not found")
-            ? `${msg} — create bucket "${PRODUCT_IMAGES_BUCKET}" (or set NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET) and run migration 20260204120007 for RLS policies.`
-            : msg,
-        );
+        onError(storageUploadUserHint(error.message, PRODUCT_IMAGES_BUCKET));
         return;
       }
       setImagePath(key);
