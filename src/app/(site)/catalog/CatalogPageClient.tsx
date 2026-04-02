@@ -1,34 +1,67 @@
 "use client";
 
 import { useLocale } from "@/contexts/LocaleContext";
-import {
-  categoryKeys,
-  type CategoryFilter,
-  type ProductCategory,
-  productStartingPrice,
-  type Product,
-} from "@/data/products";
-import { publicAsset } from "@/lib/basePath";
+import { categoryMenuLabel } from "@/lib/admin/category-label";
+import { fetchCatalogProductsFromSupabase } from "@/lib/catalog/supabase-catalog";
+import { createSupabaseAnonClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import { productStartingPrice, type Product } from "@/data/products";
+import { productImageUrl } from "@/lib/images/product-image-url";
+import type { Messages } from "@/locales/messages";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const filterToCategory: Record<CategoryFilter, ProductCategory | null> = {
-  all: null,
-  cakes: "cakes",
-  cookies: "cookies",
-  bread: "bread",
-};
+function catalogFilterLabel(key: string, catalog: Messages["catalog"]): string {
+  if (key === "all") return catalog.filterAll;
+  const map: Record<string, string> = {
+    cakes: catalog.filterCakes,
+    cookies: catalog.filterCookies,
+    bread: catalog.filterBread,
+    cupcakes: catalog.filterCupcakes,
+    seasonal: catalog.filterSeasonal,
+  };
+  return map[key] ?? categoryMenuLabel(key);
+}
 
-export function CatalogPageClient({ products }: { products: Product[] }) {
+export function CatalogPageClient({ products: initialProducts }: { products: Product[] }) {
   const { locale, messages } = useLocale();
   const c = messages.catalog;
-  const [filter, setFilter] = useState<CategoryFilter>("all");
+  const [products, setProducts] = useState(initialProducts);
+  const [filter, setFilter] = useState<string>("all");
+
+  useEffect(() => {
+    setProducts(initialProducts);
+  }, [initialProducts]);
+
+  useEffect(() => {
+    if (!hasSupabaseEnv()) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const supabase = createSupabaseAnonClient();
+        const fresh = await fetchCatalogProductsFromSupabase(supabase);
+        if (!cancelled && fresh?.length) {
+          setProducts(fresh);
+        }
+      } catch {
+        /* keep SSR / static snapshot */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filterKeys = useMemo(() => {
+    const slugs = Array.from(new Set(products.map((p) => p.category))).sort((a, b) =>
+      a.localeCompare(b),
+    );
+    return ["all", ...slugs];
+  }, [products]);
 
   const filtered = useMemo(() => {
-    const cat = filterToCategory[filter];
-    if (!cat) return products;
-    return products.filter((p) => p.category === cat);
+    if (filter === "all") return products;
+    return products.filter((p) => p.category === filter);
   }, [filter, products]);
 
   return (
@@ -41,7 +74,7 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
       </header>
 
       <div className="mt-8 flex flex-wrap justify-center gap-2 md:justify-start">
-        {categoryKeys.map((key) => (
+        {filterKeys.map((key) => (
           <button
             key={key}
             type="button"
@@ -52,10 +85,7 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
                 : "bg-white text-primary-700 ring-1 ring-primary/15 hover:bg-primary-50"
             }`}
           >
-            {key === "all" && c.filterAll}
-            {key === "cakes" && c.filterCakes}
-            {key === "cookies" && c.filterCookies}
-            {key === "bread" && c.filterBread}
+            {catalogFilterLabel(key, c)}
           </button>
         ))}
       </div>
@@ -69,7 +99,7 @@ export function CatalogPageClient({ products }: { products: Product[] }) {
             >
               <div className="relative aspect-[4/3] bg-surface">
                 <Image
-                  src={publicAsset(p.image)}
+                  src={productImageUrl(p.image)}
                   alt={p.names[locale]}
                   fill
                   className="object-cover"

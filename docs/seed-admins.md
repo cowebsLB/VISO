@@ -41,3 +41,11 @@ Open `/admin/login`, enter **username** + **password** (e.g. `christian`, not an
 ## 4. CI / E2E (optional)
 
 For automated tests, use a dedicated test project or test users and GitHub **secrets** — never log passwords.
+
+## Troubleshooting
+
+| Message or symptom | What to check |
+|--------------------|----------------|
+| **“Your account is not linked as staff”** but you see a row in `public.admins` | Ensure `admins.user_id` exactly matches **Authentication → Users →** that user’s **UUID** (not email). Ensure the site’s `NEXT_PUBLIC_SUPABASE_*` env vars are for the **same** project. Use a current app build: staff checks query `.eq("user_id", session.user.id)` so RLS returning multiple admin rows does not break verification. |
+| **“Could not verify staff”** with a PostgREST error | Network/CORS, wrong anon key, or RLS/policy drift; compare local env to Dashboard **Settings → API**. |
+| Admin pages load but **orders/menu are empty** | Often `is_admin()` false: missing or wrong `admins` row, or signed in as a different Auth user than the one in `admins`. |

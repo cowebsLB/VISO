@@ -1,9 +1,7 @@
 import type { LocaleCode } from "@/lib/locale";
 
-export type ProductCategory =
-  | "cakes"
-  | "cookies"
-  | "bread";
+/** Category slug from DB (e.g. cakes, bread) or static seed data. */
+export type ProductCategory = string;
 
 export type Localized = Record<LocaleCode, string>;
 
@@ -238,15 +236,6 @@ export const products: Product[] = [
     ],
   },
 ];
-
-export const categoryKeys = [
-  "all",
-  "cakes",
-  "cookies",
-  "bread",
-] as const;
-
-export type CategoryFilter = (typeof categoryKeys)[number];
 
 export function productById(id: string): Product | undefined {
   return products.find((p) => p.id === id);

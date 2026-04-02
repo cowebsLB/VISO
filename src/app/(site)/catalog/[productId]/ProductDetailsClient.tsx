@@ -3,23 +3,57 @@
 import { useCart } from "@/contexts/CartContext";
 import { useLocale } from "@/contexts/LocaleContext";
 import type { Product } from "@/data/products";
-import { publicAsset } from "@/lib/basePath";
+import { fetchCatalogProductsFromSupabase } from "@/lib/catalog/supabase-catalog";
+import { productImageUrl } from "@/lib/images/product-image-url";
+import { createSupabaseAnonClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type ProductDetailsClientProps = {
   product: Product;
 };
 
-export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
+export function ProductDetailsClient({ product: initialProduct }: ProductDetailsClientProps) {
   const { locale, messages } = useLocale();
   const { addLine, lines } = useCart();
   const c = messages.catalog;
 
+  const [product, setProduct] = useState(initialProduct);
+
+  useEffect(() => {
+    setProduct(initialProduct);
+  }, [initialProduct]);
+
+  useEffect(() => {
+    if (!hasSupabaseEnv()) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const supabase = createSupabaseAnonClient();
+        const list = await fetchCatalogProductsFromSupabase(supabase);
+        if (cancelled || !list?.length) return;
+        const fresh = list.find((p) => p.id === initialProduct.id);
+        if (fresh) setProduct(fresh);
+      } catch {
+        /* keep build-time product */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialProduct.id]);
+
   const [selectedOptionId, setSelectedOptionId] = useState(
-    product.options[0]?.id ?? "",
+    () => initialProduct.options[0]?.id ?? "",
   );
+
+  useEffect(() => {
+    const first = product.options[0]?.id ?? "";
+    setSelectedOptionId((prev) =>
+      product.options.some((o) => o.id === prev) ? prev : first,
+    );
+  }, [product]);
 
   const selectedOption = useMemo(
     () =>
@@ -49,7 +83,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
       <div className="mt-6 grid gap-8 rounded-2xl bg-white p-5 shadow-card ring-1 ring-primary/10 md:grid-cols-2 md:p-8">
         <div className="relative aspect-square overflow-hidden rounded-2xl bg-surface">
           <Image
-            src={publicAsset(product.image)}
+            src={productImageUrl(product.image)}
             alt={product.names[locale]}
             fill
             className="object-cover"

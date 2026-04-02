@@ -25,7 +25,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Use **digits only** for WhatsApp (country code + number, no `+`). Supabase **anon** key is safe in the browser (RLS applies); never put the **service role** key in `NEXT_PUBLIC_*`.
 
-Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. See `docs/seed-admins.md` for provisioning the four staff accounts.
+Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. See **`docs/seed-admins.md`** (Auth + `admins` rows) and **`docs/catalog-storage-and-staff.md`** (live catalog fetch, Storage bucket, staff/RLS notes).
 
 ## Scripts
 
@@ -64,7 +64,7 @@ taskkill /PID <pid> /F
 ## Assets
 
 - **Logo:** `public/Logo.png` (main mark). Favicons: `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-*.png`, `src/app/favicon.ico`.
-- **Product images:** SVG placeholders under `public/images/products/`. Swap paths in `src/data/products.ts` and add files under `public/` as needed.
+- **Product images:** Either static files under `public/` (DB value like `/images/products/photo.webp`) or **Supabase Storage** bucket **`product-images`** (migration `20260204120007_storage_product_images.sql`). Staff can upload from **Admin → Menu**; optional **Convert to WebP** runs in the browser when the format supports it, otherwise the original file is uploaded. The storefront builds public URLs from `NEXT_PUBLIC_SUPABASE_URL` + the stored object key.
 
 ## PWA
 
@@ -75,6 +75,13 @@ taskkill /PID <pid> /F
 
 - **Vercel / Node host:** connect the repo and set `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
 - **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Add **repository secrets**: `WHATSAPP_ORDER_NUMBER` (digits only), `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (for catalog static paths and client-side checkout/admin).
+
+## Documentation
+
+| Doc | Topics |
+|-----|--------|
+| `docs/seed-admins.md` | Staff Auth users, `public.admins`, troubleshooting |
+| `docs/catalog-storage-and-staff.md` | Client catalog refresh, `product-images` bucket, image paths, staff query vs RLS |
 
 ## Project structure (high level)
 
