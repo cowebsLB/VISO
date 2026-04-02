@@ -1,15 +1,17 @@
 "use client";
 
-import { staffEmailFromUsername } from "@/lib/admin/staff-email";
+import { resolveStaffAuthEmail, STAFF_EMAIL_DOMAIN } from "@/lib/admin/staff-email";
 import {
   createSupabaseAnonClient,
   hasSupabaseEnv,
 } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -24,9 +26,9 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       const supabase = createSupabaseAnonClient();
-      const email = staffEmailFromUsername(username);
+      const email = resolveStaffAuthEmail(emailOrUsername);
       if (!email) {
-        setError("Enter your username.");
+        setError("Enter your Gmail (or other email) or staff username.");
         return;
       }
       const { error: signErr } = await supabase.auth.signInWithPassword({
@@ -35,13 +37,22 @@ export default function AdminLoginPage() {
       });
       if (signErr) {
         const msg = signErr.message.toLowerCase();
-        if (msg.includes("invalid") || signErr.status === 400) {
-          setError("Wrong username or password, or this user is not set up in Supabase Auth.");
-        } else {
-          setError(signErr.message);
+        if (msg.includes("email not confirmed") || msg.includes("not confirmed")) {
+          setError(
+            "This account’s email is not confirmed. In Supabase → Authentication → Users, confirm the user or disable “Confirm email” for testing.",
+          );
+          return;
         }
+        if (msg.includes("invalid") || signErr.status === 400) {
+          setError(
+            `Wrong email or password. Use the same address as in Supabase Authentication (e.g. your Gmail). Short names only work for synthetic staff emails (username@${STAFF_EMAIL_DOMAIN}).`,
+          );
+          return;
+        }
+        setError(signErr.message);
         return;
       }
+      router.replace("/admin");
     } finally {
       setLoading(false);
     }
@@ -64,19 +75,22 @@ export default function AdminLoginPage() {
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">
       <h1 className="font-display text-3xl font-bold text-primary-800">Staff login</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Internal username and password only — not customer email.
+        Sign in with the <strong>same email</strong> as in Supabase (e.g. Gmail). If you still use synthetic
+        staff accounts, a short name maps to{" "}
+        <span className="font-mono text-xs">@{STAFF_EMAIL_DOMAIN}</span>.
       </p>
       <form onSubmit={(e) => void onSubmit(e)} className="mt-8 space-y-4">
         <div>
           <label htmlFor="adm-user" className="block text-sm font-medium text-slate-700">
-            Username
+            Email or username
           </label>
           <input
             id="adm-user"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="text"
+            value={emailOrUsername}
+            onChange={(e) => setEmailOrUsername(e.target.value)}
             autoComplete="username"
-            placeholder="christian"
+            placeholder="you@gmail.com"
             className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-primary-400"
             data-testid="admin-login-user"
           />

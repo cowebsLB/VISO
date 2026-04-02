@@ -9,7 +9,8 @@ export function AdminUserMenu() {
   async function signOut() {
     if (!hasSupabaseEnv()) return;
     const supabase = createSupabaseAnonClient();
-    await supabase.auth.signOut();
+    // `scope: "global"` hits `/logout` and can 403 with the anon key; local clears this client only.
+    await supabase.auth.signOut({ scope: "local" });
     router.replace("/admin/login");
   }
 

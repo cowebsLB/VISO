@@ -40,6 +40,10 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!hasSupabaseEnv()) return;
+      if (session && isLogin) {
+        router.replace("/admin");
+        return;
+      }
       if (!session && !isLogin) router.replace("/admin/login");
     });
 

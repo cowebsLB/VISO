@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
+  // Windows dev: segment explorer + webpack can throw "React Client Manifest" / missing chunks
+  // after a corrupt .next; disabling avoids cascading 500s until cache is cleaned.
+  experimental: {
+    devtoolSegmentExplorer: false,
+  },
   images: {
     unoptimized: true,
     remotePatterns: (() => {

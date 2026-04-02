@@ -17,3 +17,15 @@ export function staffEmailFromUsername(username: string): string {
   if (!u) return "";
   return `${u}@${STAFF_EMAIL_DOMAIN}`;
 }
+
+/**
+ * Value for `signInWithPassword({ email })`.
+ * - No `@` → synthetic staff email (`name` → `name@viso-admin.local`).
+ * - Contains `@` → use trimmed input as the Auth email (Dashboard invites with a real address).
+ */
+export function resolveStaffAuthEmail(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if (t.includes("@")) return t.toLowerCase();
+  return staffEmailFromUsername(t);
+}
