@@ -73,7 +73,10 @@
     "nameRequired": "Name is required.",
     "emptyCart": "Your cart is empty — add items from the menu.",
     "orderPrefix": "New order from Anush Badar site",
-    "orderThanks": "Thank you!"
+    "orderThanks": "Thank you!",
+    "orderSubmitted": "Order saved. Reference:",
+    "orderSubmitError": "Could not save your order. Fix the issue below, then try again.",
+    "supabaseMissing": "Online ordering is not configured. Use WhatsApp to send your order."
   },
   "contact": {
     "title": "Contact",

@@ -115,6 +115,7 @@ export function ProductDetailsClient({ product }: ProductDetailsClientProps) {
                 title: `${product.names[locale]} - ${selectedOption.names[locale]}`,
                 unitPrice: selectedOption.price,
                 qty: 1,
+                image: product.image,
               })
             }
             className="mt-6 w-full rounded-xl bg-primary-500 py-3 text-sm font-semibold text-white shadow-soft transition hover:bg-primary-600 active:scale-[0.98]"

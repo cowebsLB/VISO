@@ -23,6 +23,14 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     remotePatterns: [],
   },
+  // Windows: webpack persistent cache can corrupt (ENOENT chunks / manifest) when .next is
+  // cleared mid-dev or antivirus locks files; disabling dev cache avoids bad chunk refs.
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.cache = false;
+    }
+    return config;
+  },
 };
 
 export default withSerwist(nextConfig);

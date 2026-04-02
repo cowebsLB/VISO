@@ -72,6 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             qty: lines[i].qty + qty,
             title: line.title,
             unitPrice: line.unitPrice,
+            image: line.image ?? lines[i].image,
           };
         } else {
           lines.push({
@@ -79,6 +80,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             title: line.title,
             unitPrice: line.unitPrice,
             qty,
+            image: line.image,
           });
         }
         return { ...prev, lines };

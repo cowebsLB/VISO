@@ -101,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {process.env.NEXT_PUBLIC_BUILD_ID ? (
           <meta name="build-id" content={process.env.NEXT_PUBLIC_BUILD_ID} />

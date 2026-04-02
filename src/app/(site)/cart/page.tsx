@@ -37,15 +37,16 @@ export default function CartPage() {
             {lines.map((line) => {
               const baseProductId = line.productId.split(":")[0];
               const p = productById(baseProductId);
+              const img = line.image ?? p?.image;
               return (
                 <li
                   key={line.productId}
                   className="flex gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-primary/10"
                 >
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-surface">
-                    {p && (
+                    {img && (
                       <Image
-                        src={publicAsset(p.image)}
+                        src={publicAsset(img)}
                         alt=""
                         fill
                         className="object-cover"
