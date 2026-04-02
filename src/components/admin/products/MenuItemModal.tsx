@@ -151,7 +151,7 @@ export function MenuItemModal({
         : [newOptRow()],
     );
     if (justOpened) setNewCategoryLabel("");
-  }, [open, mode, product, names, descEn, existingOptions, optionNameEn, categories]);
+  }, [open, mode, product, names, descEn, existingOptions, optionNameEn, categories, onError]);
 
   function addOptLine() {
     setOpts((prev) => [...prev, newOptRow()]);

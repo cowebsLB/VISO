@@ -11,7 +11,7 @@ export function slugifyForId(input: string): string {
 }
 
 export function uniqueSlug(base: string, taken: Set<string>): string {
-  let id = slugifyForId(base);
+  const id = slugifyForId(base);
   if (!taken.has(id)) return id;
   let n = 2;
   while (taken.has(`${id}-${n}`)) n += 1;

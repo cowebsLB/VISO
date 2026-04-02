@@ -5,6 +5,7 @@ import { categoryMenuLabel } from "@/lib/admin/category-label";
 import { publicAsset } from "@/lib/basePath";
 import { productImageUrl } from "@/lib/images/product-image-url";
 import { hasSupabaseEnv } from "@/lib/supabase/client";
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MenuItemModal,
@@ -13,8 +14,7 @@ import {
   type ProductRow,
 } from "@/components/admin/products/MenuItemModal";
 
-const LOCALES = ["en", "ar", "hy"] as const;
-type Locale = (typeof LOCALES)[number];
+type Locale = "en" | "ar" | "hy";
 
 type PiRow = {
   product_id: string;
@@ -37,17 +37,21 @@ const btnDeleteOutline =
   "inline-flex items-center justify-center rounded-full border-2 border-red-600 bg-white px-3 py-1.5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50";
 
 function Thumb({ path }: { path: string | null }) {
-  const src = path?.trim()
-    ? productImageUrl(path.trim())
-    : publicAsset("/images/products/bread.svg");
+  const fallback = publicAsset("/images/products/bread.svg");
+  const desired = path?.trim() ? productImageUrl(path.trim()) : fallback;
+  const [src, setSrc] = useState(desired);
+  useEffect(() => {
+    setSrc(desired);
+  }, [desired]);
   return (
-    <img
+    <Image
       src={src}
       alt=""
+      width={44}
+      height={44}
+      unoptimized
       className="h-11 w-11 rounded-lg border border-slate-200 bg-slate-50 object-cover"
-      onError={(e) => {
-        e.currentTarget.src = publicAsset("/images/products/bread.svg");
-      }}
+      onError={() => setSrc(fallback)}
     />
   );
 }
@@ -229,7 +233,10 @@ export default function MenuItemsAdmin() {
     hy: editPi?.hy?.name ?? "",
   };
   const editDescEn = editPi?.en?.description ?? "";
-  const editOptions = editingProduct ? (optionsByProduct.get(editingProduct.id) ?? []) : [];
+  const editOptions = useMemo(
+    () => (editingProduct ? (optionsByProduct.get(editingProduct.id) ?? []) : []),
+    [editingProduct, optionsByProduct],
+  );
   const editOptionLabels = useMemo(() => {
     const m = new Map<string, string>();
     if (!editingProduct) return m;
