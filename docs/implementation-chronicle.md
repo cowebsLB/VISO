@@ -1,323 +1,366 @@
-# VISO — implementation chronicle
+# VISO — full session chronicle (entire chat)
 
-This document is a **detailed, narrative record** of major work on the VISO bakery site: features added, infrastructure choices, **errors encountered** (when, where, why), and **how they were fixed**. It includes catalog/Supabase integration, admin menu management, Storage for product images, local development tooling, service worker behavior, and **UI/UX copy cleanup**.
+This document reconstructs work from **the full Cursor conversation** that built and evolved the Anush Badar / VISO bakery site—not only the Supabase phase. It is intentionally long: **what you asked for**, **what broke**, **where it showed up**, **why**, and **what we changed**.
 
-It is meant for future you (or another developer) who needs context beyond commit messages. It is **not** a minimal README; it is intentionally verbose.
-
----
-
-## Table of contents
-
-1. [Product goals (what we were building)](#1-product-goals-what-we-were-building)
-2. [Database and Supabase](#2-database-and-supabase)
-3. [Public catalog and storefront](#3-public-catalog-and-storefront)
-4. [Admin: menu / products](#4-admin-menu--products)
-5. [Supabase Storage: product images](#5-supabase-storage-product-images)
-6. [Staff access and `is_admin`](#6-staff-access-and-is_admin)
-7. [Checkout and orders (context)](#7-checkout-and-orders-context)
-8. [Errors, symptoms, and fixes](#8-errors-symptoms-and-fixes)
-9. [Development tooling and scripts](#9-development-tooling-and-scripts)
-10. [UI and UX changes](#10-ui-and-ux-changes)
-11. [Documentation and env vars](#11-documentation-and-env-vars)
-12. [File index (where things live)](#12-file-index-where-things-live)
+**Source:** Agent transcript [`fb482a58-708f-4958-b5a5-cbde8dec7db3`](fb482a58-708f-4958-b5a5-cbde8dec7db3) (parent chat), plus repo state. Some assistant turns in the transcript are redacted; user questions and summarized outcomes are preserved.
 
 ---
 
-## 1. Product goals (what we were building)
+## How to use this doc
 
-- **Menu driven by Supabase**, not only static JSON: categories and products load from the database; admin can **create new categories** and CRUD products.
-- **Storefront** (catalog list, product detail, cart) should reflect DB changes where possible (client refetch when env is set; static export caveats documented).
-- **Product images** via **Supabase Storage** (public bucket), with optional **WebP conversion in the browser** before upload.
-- **Admin area** (`/admin`) for staff: login, orders, **menu/products** with a usable Tailwind UI.
-- **GitHub Pages** deployment with optional **`NEXT_PUBLIC_BASE_PATH`** (e.g. `/VISO`) without breaking local dev URLs.
+- **Timeline:** Roughly follows the order of the chat (planning → storefront → Pages → branding → catalog depth → Supabase admin → checkout/RLS → menu admin UX → storage → dev stability → polish).
+- **Errors:** Many entries include **symptom → cause → fix → files or commands**.
+- **Security:** Do not paste **service role** keys or live passwords here; the chat once put anon URL/key in `.env.local` (gitignored)—rotate keys if a transcript could leak.
 
 ---
 
-## 2. Database and Supabase
+## Part A — Vision, plan, and first build
 
-### Migrations (ordered)
+### A.1 Original ask (home bakery catalog)
 
-Under `supabase/migrations/`:
+- **Ask:** Small catalog site for VISO: **home, catalog, contact**; palette **#ff4610** + shades, characters orange, background **#d4eaea**; micro-interactions; **HTML, Tailwind, JS/TS**, light SEO, social footer; logo in assets.
+- **Reality:** Repo was nearly empty (README); plan assumed logo path under `public/` / assets.
 
-| File | Purpose (summary) |
-|------|-------------------|
-| `20260204120000_core_schema.sql` | Core tables (products, categories, options, i18n, orders, etc.) |
-| `20260204120001_rls_and_helpers.sql` | RLS policies, **`public.is_admin()`** (checks `public.admins` for `auth.uid()`), catalog read policies |
-| `20260204120002_functions.sql` | RPCs / server-side helpers (checkout-related, admin checks) |
-| `20260204120003_seed_catalog.sql` | Seed data for catalog |
-| `20260204120004_checkout_rpc_bypass_rls.sql` | Checkout RPC path vs RLS |
-| `20260204120005_checkout_anon_insert_policies.sql` | Anon insert policies for web orders |
-| `20260204120006_checkout_rpc_security_definer.sql` | Security definer hardening for checkout RPC |
-| `20260204120007_storage_product_images.sql` | **`product-images` bucket** + **`storage.objects` policies** |
+### A.2 UI/UX depth and trilingual
 
-### Why Storage is a separate migration
+- **Ask:** More UI/UX detail.
+- **Outcome:** Plan expanded to **cozy handmade** direction, **English + Arabic + Armenian**, RTL for Arabic, `localStorage` locale, typography (display + Noto families), sticky header, footer, motion with **`prefers-reduced-motion`**, a11y, SEO.
 
-Storage uses the **`storage`** schema (`storage.buckets`, `storage.objects`). Policies must reference **`bucket_id = 'product-images'`** and **`public.is_admin()`** for staff uploads. Creating a bucket **only in the Dashboard** does **not** create those policies; uploads then fail with **RLS / permission** errors until the SQL is applied.
+### A.3 Cart → checkout → WhatsApp + images + “you write languages”
 
----
+- **Ask:** **Add to cart**, **cart page**, **checkout** with prefilled line items; **WhatsApp** prefilled message; **image optimization**; implement **en/ar/hy** copy (owner did not want to author translations).
 
-## 3. Public catalog and storefront
+### A.4 Stack pivot: React / Node / TS / Tailwind / custom CSS animations
 
-### Shared catalog fetch
+- **Ask:** Use **React, Node, TS, Tailwind**, custom animation CSS.
+- **Outcome:** Plan and implementation moved to **Next.js App Router** (React + Node toolchain), `globals.css` keyframes, Tailwind layout.
 
-- Logic was centralized (e.g. `src/lib/catalog/supabase-catalog.ts` — **`fetchCatalogProductsFromSupabase`** pattern) so build-time and runtime paths stay consistent.
-- **`load-catalog.ts`** (or equivalent load path) uses that shared fetch for static generation / SSG.
+### A.5 PWA: aggressive caching + sensible reload behavior
 
-### Client refetch
+- **Ask:** PWA with **aggressive caching** and **cache reset on reload**.
+- **Outcome:** **Serwist** integration, precache + runtime strategies, **network-first for navigations** so reload is not stuck on stale HTML; versioned cache cleanup on new SW—not “wipe every cache every reload” (that would defeat caching). Manifest + icons.
 
-When **`NEXT_PUBLIC_SUPABASE_URL`** and **`NEXT_PUBLIC_SUPABASE_ANON_KEY`** are set:
+### A.6 “Implement the plan” — greenfield Next app
 
-- **`CatalogPageClient`** and **`ProductDetailsClient`** refetch the active catalog **after mount** in the browser so menu changes appear **without redeploy** (for data already reachable by anon RLS).
+- **Action:** Scaffold **Next 15**, **React 19**, **TS**, **Tailwind**, **Fraunces + Noto** fonts, `src/app/(site)/` routes: `/`, `/catalog`, `/cart`, `/checkout`, `/contact`.
+- **Features:** `LocaleProvider`, `CartProvider`, `localStorage` cart + locale, **`buildWhatsAppUrl`**, **`NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`**, Serwist **`src/app/sw.ts`** → **`public/sw.js`** (disabled in dev), `ClientProviders` with `SerwistProvider`.
+- **Friction:** Creating project in folder with spaces / npm naming—**manual file scaffold** instead of `create-next-app` into invalid package name.
 
-### Categories
+### A.7 Header UX: cart on the far right
 
-- **`Product.category`** (or equivalent) is modeled as a **category slug** string for filters and URLs.
-- Category filters on the catalog are **dynamic** from loaded data.
+- **Ask:** Cart as a **button at the far right**, not inline with main nav.
+- **Outcome:** **`Header.tsx`**: desktop center nav without cart; **right cluster**: language, then cart (icon + label + badge); mobile: hamburger, cart rightmost; RTL-safe `ms-auto`.
 
-### Static hosting caveat
+### A.8 First commit
 
-- **`generateStaticParams`** only knows product IDs from the **last build**. Brand-new product **routes** may still 404 on pure static hosts until a new build; in-app navigation from a refreshed list can still work. This is documented in **`docs/catalog-storage-and-staff.md`**.
+- **Ask:** Commit and push.
+- **Outcome:** e.g. `feat: Next.js bakery site with cart, i18n, PWA, and WhatsApp checkout` on `main`.
 
 ---
 
-## 4. Admin: menu / products
+## Part B — GitHub Pages (README instead of site)
 
-### Features
+### B.1 Symptom
 
-- **List** products with search, thumbnails, **On website** toggle, edit/delete.
-- **Modal** for add/edit: English name/description, Arabic/Armenian names, category (select + **add new category**), weight per unit, **photo** (upload or path), choices/prices.
+- **Where:** `https://cowebslb.github.io/VISO/` (or project Pages URL).
+- **What:** User saw **GitHub’s README render**, not the app.
 
-### New categories
+### B.2 Cause
 
-- Admin can **insert** into **`product_categories`** (not limited to pre-seeded slugs).
+- **Why:** Pages was serving **repo root** or branch without a **built static site**; no `out/` artifact.
 
-### Relevant files
+### B.3 Fix
 
-- `src/components/admin/products/MenuItemsAdmin.tsx`
-- `src/components/admin/products/MenuItemModal.tsx`
-- `src/lib/admin/slugify.ts`, `category-label.ts`, `prepare-image-upload.ts`, `storage-upload-hint.ts`
+- **`output: 'export'`** in Next config for static export.
+- **`NEXT_PUBLIC_BASE_PATH=/VISO`** for **project Pages** subpath.
+- **`.github/workflows/deploy-pages.yml`**: build → upload **`out/`** → **GitHub Actions** Pages deploy.
+- **`public/.nojekyll`** so `_next` and friends are not stripped by Jekyll.
+- **`src/lib/basePath.ts`** + **`publicAsset()`** so logo, images, links use **`/VISO/...`** not root-relative 404s.
+- **`src/app/manifest.ts`** (with `force-static`) replacing conflicting static manifest; correct `start_url` / icons with base path.
+- **`layout.tsx`**: `metadataBase`, OG URLs to **`https://cowebslb.github.io/VISO`**.
+- **`not-found.tsx`**: home link respects base path.
+- **Serwist:** removed duplicate **`swUrl`/`scope`** that doubled base path (`/VISO/VISO/sw.js`).
+- **Docs:** README — set Pages **source = GitHub Actions**, not “deploy from branch.”
 
----
+### B.4 WhatsApp secret and real number
 
-## 5. Supabase Storage: product images
-
-### Bucket
-
-- **Default bucket id:** **`product-images`** (hyphenated, lowercase).
-- Override via **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`** if the Dashboard id differs.
-- Implemented in **`src/lib/supabase/product-images-bucket.ts`** (`PRODUCT_IMAGES_BUCKET`), used by:
-
-  - **`src/lib/images/product-image-url.ts`** — builds public URLs for `menu/<key>` paths
-  - **`MenuItemModal.tsx`** — `storage.from(PRODUCT_IMAGES_BUCKET).upload(...)`
-
-### URL shape (critical)
-
-Public objects must use:
-
-```text
-{SUPABASE_URL}/storage/v1/object/public/{bucket}/{objectKey}
-```
-
-If a URL is saved **without** the **`public`** segment (`.../object/product-images/...`), Storage often returns **400**. The app now **normalizes** full `https://*.supabase.co/...` URLs that omit `public` via **`normalizeSupabasePublicObjectUrl`** in `product-image-url.ts`. **Best practice:** store **only the object key** (e.g. `menu/<uuid>.webp`) in **`products.image_path`**.
-
-### Upload pipeline
-
-- **`prepareImageForUpload`** (`src/lib/admin/prepare-image-upload.ts`): optional canvas → **WebP**; fallback to original file.
-- **`storageImageContentType`**: maps extension / type so uploads are not sent as **`application/octet-stream`**, which **buckets with `allowed_mime_types`** reject.
-
-### RLS policies (migration `007`)
-
-- **SELECT** for **`anon`** and **`authenticated`** on `bucket_id = 'product-images'`.
-- **INSERT / UPDATE / DELETE** for **`authenticated`** when **`(SELECT public.is_admin())`** is true.
-
-### Applying policies from the machine
-
-- **`npm run db:storage-policies`** runs:
-
-  `npx supabase db query -f supabase/migrations/20260204120007_storage_product_images.sql --linked`
-
-  Requires Supabase CLI **login** and **`supabase link`** to the project. Alternatively: paste the same SQL in the Dashboard **SQL Editor**.
-
-### Upload error hints
-
-- **`src/lib/admin/storage-upload-hint.ts`** — maps Storage API messages to short actionable text (bucket missing, RLS, MIME, size, duplicate).
+- **Ask:** Use GitHub secret **`WHATSAPP_ORDER_NUMBER`**; real number **+961 71 408 822**.
+- **Outcome:** Workflow maps secret → **`NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`**; value **96171408822** (digits only for `wa.me`); `.env.example`, fallbacks, footer WhatsApp link aligned.
 
 ---
 
-## 6. Staff access and `is_admin`
+## Part C — Branding, easter egg, favicons, real product photos
 
-### Model
+### C.1 Footer chibi “COwebs.lb”
 
-- Staff rows in **`public.admins`** with **`user_id`** = Supabase Auth user UUID.
-- RLS on many tables uses **`public.is_admin()`**.
+- **Ask:** **`made by.png`** at bottom: head peek; hover / tap reveals slowly; bubble **made by COwebs.lb (cowebslb.com)**.
+- **Outcome:** **`public/made-by-chibi.png`**, **`FooterChibiPeek.tsx`**, wired in **`Footer.tsx`**; reduced-motion respected; note about transparent PNG if exported.
 
-### `getStaffSupabase` (`src/lib/admin/staff-access.ts`)
+### C.2 Favicon pack integration
 
-- Creates anon client, checks session, then verifies staff by querying **`admins`** with **`.eq("user_id", session.user.id)`** and **`.maybeSingle()`**.
+- **Ask:** android-chrome, apple-touch, favicon PNGs, `favicon.ico`, `site.webmanifest` from `assets/logo/`.
+- **Outcome:** Files under **`public/`**, **`src/app/favicon.ico`**, **`layout.tsx` metadata.icons**, **`manifest.ts`** icons; reference **`assets/logo/site.webmanifest`** kept in sync for humans; live manifest from **`manifest.ts`**.
 
-### Bug: “not staff” despite a row existing
+### C.3 Rebrand: Anush Badar + new `Logo.png`
 
-- **When:** Admin UI showed not linked as staff even when a row existed.
-- **Why:** RLS allows admins to **see all** `admins` rows. An **unfiltered** `select ... maybeSingle()` can return **multiple rows**; PostgREST then errors on `maybeSingle()`, and the UI treated it as failure.
-- **Where:** `staff-access.ts` (and any similar pattern).
-- **Fix:** Always **filter by the current user’s `user_id`** before `maybeSingle()`.
+- **Ask:** New name and logo assets.
+- **Outcome:** **`src/lib/brand.ts`** (`BRAND_NAME`, etc.); **Anush Badar — Bakery & Sweets** across metadata and locales; **`public/Logo.png`**; removed old **`viso-logo.jpg`**; contact placeholder email; GitHub path still **`/VISO`** (repo name).
 
-### Modal stability (HMR)
+### C.4 Real menu WebPs instead of SVG placeholders
 
-- **`onError`** passed into the modal: effect dependencies used a **ref** (`onErrorRef`) so callbacks stay fresh without unstable `useEffect` dependency arrays.
+- **Ask:** Use provided **`assets/Menu items/*.webp`** as products.
+- **Outcome:** Copied/renamed under **`public/images/products/`**; **`src/data/products.ts`** updated ids, paths, categories, multi-option “fillings” where applicable.
 
----
+### C.5 Prices from a photo; dev server
 
-## 7. Checkout and orders (context)
+- **Ask:** Take **prices only** from a pricing image; run site for live updates.
+- **Outcome:** Price updates in data; dev server run (ports varied early on).
 
-- Web checkout flows through **RPC** + RLS-related migrations (`004`–`006`).
-- Cart lines map to payload; WhatsApp flow preserved where applicable.
-- Admin **orders** list/detail — part of broader admin work; this chronicle focuses more on catalog/storage but orders share the same **`is_admin`** model.
+### C.6 React hydration warning
 
----
+- **Ask:** Next hydration mismatch warning (server/client HTML differ).
+- **Typical causes:** `Date.now()`, `Math.random()`, `typeof window`, extensions mutating DOM, locale formatting.
+- **Outcome:** Tracked down client-only branches / unstable markup (specific fix depended on component—pattern: gate client-only UI, match server markup, suspect extensions).
 
-## 8. Errors, symptoms, and fixes
+### C.7 Dynamic product detail pages + fillings
 
-### 8.1 CI / ESLint
+- **Ask:** Multiple fillings; **dynamic product page** from earlier menu.
+- **Outcome:** **`/catalog/[productId]`** with **`generateStaticParams`** from catalog data; product options surfaced on detail; cart line ids composite **`productId:optionId`** where needed.
 
-- **Symptoms:** PR checks failed (e.g. `prefer-const`, React hooks rules, `img` vs `next/image` in admin).
-- **Where:** Various `src/` files including admin and `slugify.ts`.
-- **Fix:** Satisfy ESLint (const, hook deps, disable comment only where appropriate for admin thumbnails and Supabase URLs).
+### C.8 Internal Server Error (again during catalog work)
 
-### 8.2 Favicon 500 / conflict
+- **Outcome:** Iterated dev server / `.next` clean as in later Part H.
 
-- **Symptoms:** Requests to `/favicon.ico` or app icon routes returned 500.
-- **Why:** Next.js conflict when both **`public/favicon`** (or similar) and **`src/app/favicon.ico`** exist.
-- **Where:** App router metadata vs static public files.
-- **Fix:** Remove duplicate **`src/app/favicon.ico`**; keep canonical asset under **`public/`** (as documented in project).
+### C.9 Cart / checkout images missing
 
-### 8.3 `Cannot find module './NNN.js'` (e.g. `./124.js`, `./331.js`)
+- **Ask:** No images on checkout/cart line items.
+- **Outcome:** Cart schema extended with **`image`** snapshot per line; **`CART_VERSION`** bump; UI passes image from catalog into cart; **`next/image`** or `<img>` as appropriate for static export constraints.
 
-- **When:** During **`next dev`**, often after deleting **`.next`**, switching bundlers, or Windows file locking.
-- **Where:** `.next/server/.../webpack-runtime.js` pulling a missing chunk; sometimes surfaced via **`manifest.webmanifest`** or admin routes.
-- **Why:** **Incomplete or stale Webpack output** (half-written chunks, AV locking, deleting `.next` while dev server running).
-- **Fix:**
-  - **Stop** dev server → **`npm run clean`** → restart **`npm run dev`**.
-  - **`npm run clean`** runs **`scripts/clean-next.mjs`**: removes **`.next`** and **`node_modules/.cache`**.
-  - **Never** delete `.next` while **`next dev`** is still running on Windows.
-  - **`next.config.ts`**: **`webpack: (config, { dev }) => { if (dev) config.cache = false; }`** to reduce persistent cache corruption in dev.
+### C.10 WhatsApp without opening app?
 
-### 8.4 `SegmentViewNode` / “React Client Manifest” / `__webpack_modules__[moduleId] is not a function`
+- **Ask:** Auto-send WhatsApp without taking user to WhatsApp.
+- **Outcome:** Explained **browser cannot silently send WhatsApp** without official Business API backend; user dropped the idea (“forget it”).
 
-- **When:** Next.js 15 **dev** after cache issues.
-- **Why:** **Next devtools segment explorer** (`experimental.devtoolSegmentExplorer`, default **true**) plus broken chunk graph.
-- **Where:** Server components pipeline / dev overlay.
-- **Fix:** Set **`experimental: { devtoolSegmentExplorer: false }`** in **`next.config.ts`** to reduce cascading dev errors after a bad cache (still **clean `.next`** when chunks are missing).
+### C.11 Instagram link
 
-### 8.5 Turbopack on Windows: `_buildManifest.js.tmp` ENOENT
-
-- **Symptoms:** Turbopack dev failures on Windows (paths with spaces, Defender, temp manifest files).
-- **Fix:** Default **`npm run dev`** uses **Webpack**; **`npm run dev:turbopack`** remains optional.
-
-### 8.6 `NEXT_PUBLIC_BASE_PATH` vs `/_next` 404 on localhost
-
-- **Symptoms:** Static assets 404 on **`http://localhost:3040`** when `.env.local` sets a GitHub Pages base path.
-- **Why:** Dev server was applying **basePath** / **assetPrefix** while the user browsed the root URL.
-- **Where:** `next.config.ts` and **`src/lib/effective-base-path.ts`** (must stay in sync).
-- **Fix:** In **development**, **ignore** `NEXT_PUBLIC_BASE_PATH` unless **`NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`**, so local dev uses **`/`** by default.
-
-### 8.7 Service worker: `bad-precaching-response` / `_ssgManifest.js` / `_buildManifest.js` 404
-
-- **When:** **`localhost:3040`** with DevTools console errors from **`sw.js`**.
-- **Why:** A **stale service worker** from a **production** `next build` still controlled the origin; precache list pointed at **old build IDs** under **`_next/static/...`** that no longer exist after clean/rebuild.
-- **Where:** Browser + **`public/sw.js`** (Serwist output). Serwist is **disabled in dev** in config, but **old SW remains registered**.
-- **Fix:**
-  - **`ClientProviders.tsx`**: on **development** + **localhost / 127.0.0.1**, **`useEffect`** calls **`navigator.serviceWorker.getRegistrations()`** and **`unregister()`** on load.
-  - Manual fallback: DevTools → Application → Service workers → Unregister; hard refresh.
-  - README updated to mention this alongside **`bad-precaching-response`**.
-
-### 8.8 Image upload: MIME / bucket `allowed_mime_types`
-
-- **Symptoms:** Upload fails when file is sent as **`application/octet-stream`**.
-- **Why:** Bucket restricts **`allowed_mime_types`** to image types (migration `007`).
-- **Fix:** **`storageImageContentType`** in **`prepare-image-upload.ts`**; upload options pass explicit **`contentType`**.
-
-### 8.9 Storage: bucket exists, upload still fails
-
-- **Symptoms:** RLS / permission errors, or vague Storage errors.
-- **Why:** **No policies** on **`storage.objects`** for the bucket (UI-only bucket creation).
-- **Fix:** Run **`20260204120007_storage_product_images.sql`** (SQL Editor or **`npm run db:storage-policies`** when linked).
-
-### 8.10 Public image URL 400 (missing `public` in path)
-
-- **Symptoms:** Network tab shows `.../storage/v1/object/product-images/...` without **`public`**.
-- **Why:** Wrong URL stored in **`image_path`** or pasted from a non-public URL shape.
-- **Fix:** **`normalizeSupabasePublicObjectUrl`** for `https://*.supabase.co` URLs; prefer storing **keys** only.
+- **Ask:** Hook **https://www.instagram.com/anush.badar?...** to Instagram icon.
+- **Outcome:** Footer (and any other social slot) updated to real URL; commit/push.
 
 ---
 
-## 9. Development tooling and scripts
+## Part D — Supabase, admin, orders, and the long checkout / RLS thread
 
-| Script | Purpose |
-|--------|---------|
-| `npm run clean` | Delete **`.next`** and **`node_modules/.cache`** (`scripts/clean-next.mjs`) |
+### D.1 “Serious work” — Supabase-backed catalog, checkout RPC, admin
+
+**Delivered (high level):**
+
+- **Migrations** `20260204120000`–`03` (+ later `04`–`07`): schema, RLS, **`is_admin()`**, RPCs, seed catalog.
+- **Env / CI:** `.env.example`, **`deploy-pages.yml`** and **`e2e.yml`** pass **`NEXT_PUBLIC_SUPABASE_*`** via secrets.
+- **Clients:** `src/lib/supabase/client.ts` (browser), `server.ts` (build).
+- **Catalog loader:** `load-catalog.ts` — Supabase when env set, else fallback **`src/data/products.ts`**.
+- **Catalog / product routes:** server + **`CatalogPageClient`**, **`ProductDetailsClient`** for client refetch when env present.
+- **Checkout payload:** `build-payload.ts` → RPC **`create_order_from_checkout`**; **WhatsApp** still opens with message including **order ref** after successful RPC.
+- **Admin (static-export-safe):** no dynamic `[orderId]` segment; **orders list + detail** via query/searchParams or static patterns as implemented.
+- **Pages:** login, dashboard, orders, **products/menu**, recipes (BOM note), inventory (**adjust_inventory**).
+- **Docs:** `docs/seed-admins.md` — four staff users + **`public.admins`** inserts.
+- **E2E:** Playwright smoke + crawl; CI with basePath.
+
+**Note:** Early agent message: local **`npm run build`** could fail only due to **Google Fonts fetch** (`ENOTFOUND`) in sandbox—**`tsc`** still passed.
+
+### D.2 Admin URLs (reference)
+
+| Environment | URL |
+|-------------|-----|
+| Local | `http://localhost:3040/admin` |
+| Login | `http://localhost:3040/admin/login` |
+| GitHub Pages | `https://cowebslb.github.io/VISO/admin` |
+
+### D.3 Migrations applied from CLI
+
+- **Ask:** “Do them yourself” + put anon key in `.env.local`.
+- **Outcome:** **`supabase db push`** applied core migrations; **`.env.local`** created with project URL + anon key + WhatsApp (gitignored). **Auth users + `admins` rows** still manual per seed doc.
+
+### D.4 “How do I put keys in the repo?”
+
+- **Answer:** **Do not** commit secrets. Use **GitHub Actions secrets** for **`NEXT_PUBLIC_SUPABASE_URL`**, **`NEXT_PUBLIC_SUPABASE_ANON_KEY`**, **`WHATSAPP_ORDER_NUMBER`**. Anon key is “public” in the built JS but should not live in tracked plaintext history.
+
+### D.5 Staff users: “internal usernames”
+
+- **Constraint:** Supabase email/password provider still stores **`something@viso-admin.local`** in `auth.users.email`.
+- **UX:** Login form **username + password** only; code normalizes to synthetic email; **`docs/seed-admins.md`** updated.
+
+### D.6 Password for `christian`?
+
+- **Answer:** No default password in repo—set in **Supabase Dashboard** or reset there.
+
+### D.7 Multiple GoTrueClient warnings + login 400 + extension noise
+
+- **Symptoms:** Console spam **Multiple GoTrueClient instances**; **`400`** on **`/auth/v1/token`**; **`content.js`**, **message channel** errors.
+- **Causes:** New `createClient` per call; **bad password / unconfirmed user** for 400; extensions for other lines.
+- **Fixes:** **Singleton** browser Supabase client in **`client.ts`**; clearer login error UI; **`data-scroll-behavior="smooth"`** on `<html>` for Next warning.
+
+### D.8 Checkout: remove “Submit order online”, merge with WhatsApp, order not saving
+
+- **Ask:** Single WhatsApp button that **also** writes to dashboard.
+- **First RLS theory:** **`SECURITY DEFINER`** RPC still blocked by RLS — tried **`set_config('row_security','off')`** inside function (migration **004**).
+
+- **Still failing:** **`SECURITY INVOKER`** experiment + **anon INSERT policies** (migration **005**) — user thought migration wasn’t applied; **`supabase db push`** applied **005**.
+
+- **403 Forbidden on RPC:** **`INVOKER`** meant anon couldn’t satisfy FK / **`RETURNING`** visibility.
+- **Fix:** Migration **006** — restore **`SECURITY DEFINER`** for **`create_order_from_checkout`**, revoke risky anon direct inserts, `SET search_path = public`.
+
+### D.9 Orders page empty but DB has rows
+
+- **Cause:** **`SELECT` on `orders`** allowed only when **`is_admin()`** — missing row in **`public.admins`** → **zero rows, no error**.
+- **Fix:** **`getStaffSupabase()`** in **`staff-access.ts`**; explicit **“not linked as staff”** message; orders reload on auth change; user inserts **`admins`** row with their Auth UUID.
+
+### D.10 “Not admin anymore” but row exists in Supabase (`maybeSingle` bug)
+
+- **Symptom:** Staff check failed despite **`admins`** row.
+- **Cause:** RLS lets admins **see all** `admins` rows; unfiltered **`select().maybeSingle()`** with **multiple rows** → PostgREST error → UI treated as not staff.
+- **Fix:** **`.eq("user_id", session.user.id)`** before **`maybeSingle()`**.
+
+### D.11 Admin / favicon 500, missing `routes-manifest`, `./331.js`
+
+- **Cause:** Corrupt **`.next`** (deleted while dev running, Windows locks, mixed bundlers).
+- **Mitigations over time:** **`public/favicon.ico`**; **`webpack cache: false`** in dev; toggled default **`dev`** between **Turbopack** and **Webpack** (see H).
+
+### D.12 Products admin: “not all options / products”
+
+- **Cause:** Seed had **four** products; admin UI initially didn’t surface **variants** well.
+- **Iteration 1:** Options table + add option form + staff gate.
+- **Iteration 2:** “Menu items” **card** UI — owner found confusing.
+- **Iteration 3 (requested):** **Search bar**, **table**, **Add** opens **modal**; **edit** in modal — **`MenuItemsAdmin.tsx`** + **`MenuItemModal.tsx`**; live site updates via client refetch + DB (static URLs for brand-new slugs still need redeploy).
+
+### D.13 New categories + storefront from DB
+
+- **Ask:** Add **new categories** in admin, not only existing; catalog from DB.
+- **Outcome:** Admin can insert **`product_categories`**; shared catalog fetch; dynamic filters; **`productImageUrl`** for storage keys vs static paths.
+
+### D.14 Storage bucket + optional WebP in browser
+
+- **Ask:** Bucket for images; optional auto-convert to WebP.
+- **Outcome:** Migration **007** bucket **`product-images`**; upload uses **`prepareImageForUpload`** + **`storageImageContentType`**; **`PRODUCT_IMAGES_BUCKET`** env override.
+
+### D.15 CI build failure (ESLint)
+
+- **Symptom:** GitHub Actions build failed (e.g. **`prefer-const`**, hooks, `img` rules).
+- **Fix:** Lint-clean admin and lib files.
+
+### D.16 Modal `useEffect` dependency size changed
+
+- **Symptom:** React warning about **dependency array length** changing.
+- **Fix:** Stable effect deps; **`onErrorRef`** pattern so **`onError`** is not a dep that changes array length.
+
+### D.17 `layout.css` / chunks 404 on login
+
+- **Cause:** Stale **`.next`**, wrong port, or **service worker** serving old graph; sometimes **basePath** mismatch.
+- **Fix:** Clean `.next`, hard refresh, unregister SW; align **`effective-base-path`** with **`next.config`**.
+
+### D.18 Turbopack `_buildManifest.js.tmp` ENOENT (Windows)
+
+- **Symptom:** Dev with **Turbopack** on Windows fails writing manifest temp file (path with spaces exacerbates).
+- **Fix:** Default **`npm run dev`** back to **Webpack**; **`dev:turbopack`** optional; **`dev:webpack:clean`** / **`dev:turbopack:clean`**.
+
+### D.19 Duplicate `app/favicon.ico` vs `public/favicon.ico`
+
+- **Symptom:** Favicon route 500 / conflict.
+- **Fix:** Single canonical favicon location (removed duplicate under **`src/app`** per resolution).
+
+### D.20 `NEXT_PUBLIC_BASE_PATH` vs dev `/_next` 404
+
+- **Symptom:** Local dev 404 for static assets when `.env` has **`/VISO`**.
+- **Fix:** **`effective-base-path.ts`**: in **development**, ignore base path unless **`NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`**.
+
+---
+
+## Part E — Storage polish, SW, URL shape, policies CLI, UI cleanup
+
+### E.1 Bucket named “product images” vs id `product-images`
+
+- **Note:** Dashboard **display name** vs **bucket id**; code default **`product-images`**; override with **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`**.
+
+### E.2 No storage policies
+
+- **Symptom:** Upload fails (RLS).
+- **Fix:** Run **`20260204120007_storage_product_images.sql`**; **`storageUploadUserHint`** for clearer errors; **`npm run db:storage-policies`** = `supabase db query -f ... --linked` when CLI linked.
+
+### E.3 `./124.js`, SegmentViewNode, admin 500 cascade
+
+- **Fix:** **`scripts/clean-next.mjs`** (`.next` + `node_modules/.cache`); **`experimental.devtoolSegmentExplorer: false`**; README troubleshooting.
+
+### E.4 `bad-precaching-response` + Storage URL **400** (missing `public`)
+
+- **SW:** Stale **`sw.js`** precaching old **`_next/static/<buildId>/...`** → **`ClientProviders`** unregisters SW on **localhost** in dev.
+- **Storage URL:** Full URLs without **`/object/public/`** → **`normalizeSupabasePublicObjectUrl`** in **`product-image-url.ts`**.
+
+### E.5 Menu modal / page copy cleanup
+
+- Removed **GitHub Pages / republish** wall of text from modal header and menu intro; shortened **Photo** section; **Upload image**, **Prefer WebP**, **Path** label; trimmed **New category** helper.
+
+### E.6 This document (first version)
+
+- User asked for **`docs/`** MD with “everything”; first cut was Supabase-heavy; this revision is **full-chat**.
+
+---
+
+## Part F — Operational commands (current)
+
+| Script | Role |
+|--------|------|
 | `npm run dev` | Next dev, port **3040**, Webpack |
-| `npm run dev:clean` | Clean then dev |
-| `npm run dev:turbopack` / `dev:turbopack:clean` | Optional Turbopack |
-| `npm run dev:webpack:clean` | Clean then Webpack dev |
-| `npm run db:storage-policies` | Apply Storage migration to **linked** Supabase project |
+| `npm run dev:turbopack` | Optional Turbopack |
+| `npm run clean` | `scripts/clean-next.mjs` |
+| `npm run dev:clean` | clean + dev |
+| `npm run db:storage-policies` | Apply storage migration via linked Supabase |
 
 ---
 
-## 10. UI and UX changes
+## Part G — Quick error lookup table
 
-### Admin menu page (`MenuItemsAdmin.tsx`)
-
-- **Before:** Long intro about static hosting, asking publishers to redeploy, build-time catalog.
-- **After:** Short line: edit names/prices/photos; **“On website”** hides without deleting.
-
-### Add/Edit item modal (`MenuItemModal.tsx`)
-
-- **Removed** modal subtitle about live DB + GitHub Pages + republish.
-- **Photo section:**
-  - Short helper: upload then save, or path starting with **`/`**.
-  - **Upload** and **Prefer WebP** first; then labeled **Path** field with simple placeholder.
-  - Removed in-UI references to migration ids, bucket env vars, and Supabase URL in preview copy.
-  - Preview for storage keys: thumbnail only (accessible **`alt`**).
-  - Button label **Upload image**; success hint **Uploaded — press Save to apply.**
-- **New category** box: title **New category**; removed “Creates a row in the database…” explanation.
-
-Errors still surface via **`onError`** / **`storage-upload-hint`** when something breaks; happy path stays quiet.
-
----
-
-## 11. Documentation and env vars
-
-- **`README.md`**: setup, scripts, troubleshooting (`.next`, SW, base path, chunk errors).
-- **`docs/catalog-storage-and-staff.md`**: catalog refetch, **`image_path`** semantics, Storage URL shape, bucket + RLS, staff verification, **`db:storage-policies`**.
-- **`docs/seed-admins.md`**: Auth + inserting **`admins`** rows.
-- **`.env.example`**: WhatsApp, optional base path, **`NEXT_PUBLIC_SUPABASE_*`**, optional **`NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET`**.
+| Symptom | Likely cause | First-line fix |
+|--------|----------------|----------------|
+| GitHub Pages shows README | No `out/` deploy / wrong Pages source | Actions deploy from `out/`, **GitHub Actions** source |
+| Asset 404 under `/VISO` | Missing `publicAsset()` / basePath | Fix `basePath.ts` + config |
+| `localhost:3000` 500 | Wrong process on 3000 | Use **3040** or kill PID on 3000 |
+| Turbopack `ssr/[turbopack]_runtime.js` missing | Mixed Serwist Webpack + Turbopack + stale `.next` | Delete `.next`, use Webpack dev |
+| `Cannot find module './NNN.js'` | Corrupt `.next` | Stop dev → `npm run clean` → dev |
+| `SegmentViewNode` / client manifest | Next devtools + bad cache | Clean + `devtoolSegmentExplorer: false` |
+| Login 400 | Wrong password / unconfirmed user | Supabase Auth settings |
+| Multiple GoTrueClient | Many `createClient` calls | Singleton in `client.ts` |
+| RPC 403 / order not inserted | RLS + INVOKER / missing migration | Migrations **004–006** applied in order |
+| Orders list empty | No `admins` row for your UUID | `INSERT INTO admins ...` |
+| “Not staff” with rows present | `maybeSingle` + multiple `admins` rows | Filter by `user_id` |
+| Storage upload fails | No RLS policies on `storage.objects` | Run migration **007** |
+| Image URL 400 | Missing `/public/` in path | Normalize URL or store key only |
+| `bad-precaching-response` | Stale SW on localhost | Auto-unregister in dev + manual unregister |
+| `_buildManifest.js.tmp` ENOENT | Turbopack on Windows | Use Webpack dev |
 
 ---
 
-## 12. File index (where things live)
+## Part H — Key file map
 
 | Area | Paths |
 |------|--------|
-| Catalog fetch | `src/lib/catalog/supabase-catalog.ts`, load catalog utilities |
-| Image URLs | `src/lib/images/product-image-url.ts` |
-| Bucket constant | `src/lib/supabase/product-images-bucket.ts` |
-| Upload prep / MIME | `src/lib/admin/prepare-image-upload.ts` |
-| Upload error hints | `src/lib/admin/storage-upload-hint.ts` |
-| Staff session | `src/lib/admin/staff-access.ts` |
+| Brand | `src/lib/brand.ts` |
 | Base path | `src/lib/basePath.ts`, `src/lib/effective-base-path.ts` |
+| Catalog / Supabase | `src/lib/catalog/supabase-catalog.ts`, `load-catalog.ts` |
+| Images | `src/lib/images/product-image-url.ts`, `src/lib/admin/prepare-image-upload.ts` |
+| Storage errors | `src/lib/admin/storage-upload-hint.ts` |
+| Bucket id | `src/lib/supabase/product-images-bucket.ts` |
+| Staff | `src/lib/admin/staff-access.ts` |
+| Menu admin UI | `MenuItemsAdmin.tsx`, `MenuItemModal.tsx` |
+| Footer / chibi | `Footer.tsx`, `FooterChibiPeek.tsx` |
+| SW | `src/app/sw.ts`, `ClientProviders.tsx` |
 | Next config | `next.config.ts` |
-| Serwist SW source | `src/app/sw.ts` → build writes **`public/sw.js`** |
-| Client SW / providers | `src/components/ClientProviders.tsx` |
-| Storage SQL | `supabase/migrations/20260204120007_storage_product_images.sql` |
-| Clean script | `scripts/clean-next.mjs` |
-| Admin menu UI | `src/components/admin/products/MenuItemsAdmin.tsx`, `MenuItemModal.tsx` |
-| Storefront catalog UI | `src/app/(site)/catalog/CatalogPageClient.tsx`, `ProductDetailsClient.tsx` |
+| Migrations | `supabase/migrations/*.sql` |
+| Pages deploy | `.github/workflows/deploy-pages.yml` |
 
 ---
 
-## Revision note
+## Revision
 
-This chronicle reflects work through **Supabase-backed menu**, **Storage images**, **dev stability (Windows, SW, Webpack cache)**, **URL normalization**, **RLS/policy application**, and **admin copy cleanup**. If you add major features later, append a dated section or link a new doc so this file stays a **checkpoint**, not a living spec.
+- **v1:** Supabase-focused chronicle.
+- **v2 (this file):** Full multi-phase chat narrative + merged technical detail.
 
-*Last compiled: April 2026 (session documentation).*
+*Compiled from session transcript and repo state — April 2026.*
