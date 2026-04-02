@@ -95,6 +95,7 @@ taskkill /PID <pid> /F
 |-----|--------|
 | `docs/seed-admins.md` | Staff Auth users, `public.admins`, troubleshooting |
 | `docs/catalog-storage-and-staff.md` | Client catalog refresh, `product-images` bucket, image paths, staff query vs RLS |
+| `docs/implementation-chronicle.md` | Long-form history: features, errors faced, fixes, dev tooling, UI cleanup |
 
 ## Project structure (high level)
 
