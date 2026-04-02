@@ -209,7 +209,7 @@ export function MenuItemModal({
         return;
       }
       setImagePath(key);
-      setImageUploadHint("Photo uploaded — click Save to store it on this item.");
+      setImageUploadHint("Uploaded — press Save to apply.");
     } finally {
       setUploadingImage(false);
     }
@@ -487,10 +487,6 @@ export function MenuItemModal({
           <h2 id="menu-item-modal-title" className="font-display text-xl font-bold text-primary-800">
             {mode === "add" ? "Add item" : "Edit item"}
           </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            This saves to your live database. If the public site is built when you publish (e.g.
-            GitHub Pages), republish once so the storefront shows the update.
-          </p>
         </div>
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4 px-6 py-4">
           <div>
@@ -545,10 +541,7 @@ export function MenuItemModal({
               ))}
             </select>
             <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs font-medium text-slate-700">Add a new category</p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                Creates a row in the database and selects it for this item.
-              </p>
+              <p className="text-xs font-medium text-slate-700">New category</p>
               <div className="mt-2 flex flex-wrap gap-2">
                 <input
                   value={newCategoryLabel}
@@ -584,50 +577,11 @@ export function MenuItemModal({
             />
           </div>
           <div>
-            <span className="block text-sm font-medium text-slate-700">Photo (optional)</span>
+            <span className="block text-sm font-medium text-slate-700">Photo</span>
             <p className="mt-0.5 text-xs text-slate-500">
-              Click <strong>Upload image…</strong> and choose a file (upload runs immediately). Then click{" "}
-              <strong>Save</strong> — saving alone does not send your file. You can instead type a path
-              under <code className="rounded bg-slate-100 px-1">public/</code> (e.g.{" "}
-              <code className="rounded bg-slate-100 px-1">/images/products/photo.webp</code>). Storage uses
-              bucket id <code className="rounded bg-slate-100 px-1">{PRODUCT_IMAGES_BUCKET}</code>{" "}
-              (migration <code className="rounded bg-slate-100 px-1">20260204120007</code> or match your
-              Dashboard name via <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET</code>
+              Upload a file, then save. Or set a site image path (starts with <span className="font-mono">/</span>
               ).
             </p>
-            <input
-              id="menu-item-image-path"
-              value={imagePath}
-              onChange={(e) => {
-                setImagePath(e.target.value);
-                setImageUploadHint(null);
-              }}
-              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-              placeholder="/images/products/photo.webp"
-              aria-label="Photo path or storage key"
-            />
-            {imagePath.trim() && !imagePath.trim().startsWith("/") && (
-              <div className="mt-2 flex items-start gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element -- small preview; remote Supabase URL */}
-                <img
-                  src={productImageUrl(imagePath.trim())}
-                  alt=""
-                  className="h-14 w-14 shrink-0 rounded-lg border border-slate-200 bg-slate-100 object-cover"
-                  onError={(ev) => {
-                    ev.currentTarget.style.visibility = "hidden";
-                  }}
-                />
-                <p className="text-xs text-slate-500">
-                  Preview uses your <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code>.
-                  If this is blank or broken, check the bucket is public and the migration ran.
-                </p>
-              </div>
-            )}
-            {imageUploadHint && (
-              <p className="mt-2 text-sm font-medium text-emerald-700" role="status">
-                {imageUploadHint}
-              </p>
-            )}
             <input
               ref={imageFileInputRef}
               type="file"
@@ -644,7 +598,7 @@ export function MenuItemModal({
                 onClick={() => imageFileInputRef.current?.click()}
                 className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50 disabled:opacity-50"
               >
-                {uploadingImage ? "Uploading…" : "Upload image…"}
+                {uploadingImage ? "Uploading…" : "Upload image"}
               </button>
               <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-600">
                 <input
@@ -652,9 +606,41 @@ export function MenuItemModal({
                   checked={preferWebpUpload}
                   onChange={(e) => setPreferWebpUpload(e.target.checked)}
                 />
-                Convert to WebP when supported
+                Prefer WebP
               </label>
             </div>
+            <label htmlFor="menu-item-image-path" className="mt-3 block text-xs font-medium text-slate-600">
+              Path
+            </label>
+            <input
+              id="menu-item-image-path"
+              value={imagePath}
+              onChange={(e) => {
+                setImagePath(e.target.value);
+                setImageUploadHint(null);
+              }}
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
+              placeholder="/images/products/brioche.webp"
+              aria-label="Image path"
+            />
+            {imagePath.trim() && !imagePath.trim().startsWith("/") && (
+              <div className="mt-2 flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- small preview; remote Supabase URL */}
+                <img
+                  src={productImageUrl(imagePath.trim())}
+                  alt="Photo preview"
+                  className="h-14 w-14 shrink-0 rounded-lg border border-slate-200 bg-slate-100 object-cover"
+                  onError={(ev) => {
+                    ev.currentTarget.style.visibility = "hidden";
+                  }}
+                />
+              </div>
+            )}
+            {imageUploadHint && (
+              <p className="mt-2 text-sm font-medium text-emerald-700" role="status">
+                {imageUploadHint}
+              </p>
+            )}
           </div>
 
           <div className="border-t border-slate-100 pt-3">

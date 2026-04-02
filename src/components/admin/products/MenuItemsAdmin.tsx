@@ -259,9 +259,7 @@ export default function MenuItemsAdmin() {
       <div>
         <h1 className="font-display text-3xl font-bold text-primary-800">Menu</h1>
         <p className="mt-1 text-slate-600">
-          Edit names, prices, and photos here. Turning off “On website” hides an item without
-          deleting it. After you save, ask whoever publishes the site to run a fresh publish so the
-          public menu matches (static hosting reads the catalog at build time).
+          Edit names, prices, and photos. “On website” hides an item without deleting it.
         </p>
       </div>
 
