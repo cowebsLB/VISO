@@ -1,5 +1,7 @@
-/** Set to your GitHub project path (e.g. `/VISO`) when deploying to GitHub Pages. */
-export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+import { getEffectiveBasePath } from "@/lib/effective-base-path";
+
+/** GitHub Pages subpath in prod; empty in local `next dev` unless force flag (see `effective-base-path.ts`). */
+export const basePath = getEffectiveBasePath();
 
 /** Canonical site URL including path (no trailing slash). */
 export const siteUrl =

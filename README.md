@@ -25,6 +25,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Use **digits only** for WhatsApp (country code + number, no `+`). Supabase **anon** key is safe in the browser (RLS applies); never put the **service role** key in `NEXT_PUBLIC_*`.
 
+**`NEXT_PUBLIC_BASE_PATH`:** fine to keep `/VISO` in `.env.local` for production parity — **`next dev` ignores it** unless you set `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`. Otherwise you would have to open `http://localhost:3040/VISO/...` and mismatched asset URLs cause **`_next/static/...` 404** on `/admin/login`.
+
 Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. See **`docs/seed-admins.md`** (Auth + `admins` rows) and **`docs/catalog-storage-and-staff.md`** (live catalog fetch, Storage bucket, staff/RLS notes).
 
 ## Scripts
@@ -43,6 +45,12 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`** / similar chunk errors in the terminal). **Stop** the dev server (Ctrl+C), then either delete the `.next` folder manually or run **`npm run clean`**, then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** (Turbopack) or **`npm run dev:webpack:clean`** (Webpack). Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
 
 If **`Cannot find module './331.js'`** keeps coming back on **`npm run dev:webpack`**, try **`npm run dev`** (Turbopack) for local work — webpack dev + Fast Refresh on Windows is more likely to leave `.next` in a bad state.
+
+### If **`layout.css` / `main-app.js` / `_next/static/chunks/...` 404** on **3040**
+
+1. **Stop** the dev server → **`npm run clean`** → start dev again → **hard refresh** (Ctrl+Shift+R) or DevTools **Disable cache**.
+2. **Service worker:** after a production `npm run build`, Chrome may still have **`sw.js`** controlling `localhost`. Open DevTools → **Application** → **Service workers** → **Unregister** for this origin, then reload.
+3. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`).
 
 ### If you see `500` on `http://localhost:3000`
 
