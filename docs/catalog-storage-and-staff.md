@@ -23,7 +23,7 @@ When `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set:
 
 Resolution is implemented in `src/lib/images/product-image-url.ts` (`productImageUrl`).
 
-**Bucket setup:** Apply migration `20260204120007_storage_product_images.sql` (`supabase db push`). Staff upload from **Admin → Menu** (optional in-browser **WebP** conversion).
+**Bucket setup:** Apply migration `20260204120007_storage_product_images.sql` (`supabase db push`), or with the CLI linked to the project: **`npm run db:storage-policies`**. Staff upload from **Admin → Menu** (optional in-browser **WebP** conversion).
 
 ### If you created the bucket only in the Dashboard
 
