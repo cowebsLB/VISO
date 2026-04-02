@@ -33,8 +33,9 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 
 | Command | Description |
 |--------|-------------|
-| `npm run dev` | Dev server at **http://localhost:3040** (**Turbopack**; Serwist off in dev). |
-| `npm run dev:webpack` | Same port using **Webpack** (fallback if you hit Turbopack issues). |
+| `npm run dev` | Dev server at **http://localhost:3040** (**Webpack**; Serwist off in dev). Recommended on **Windows** (paths with spaces, Defender). |
+| `npm run dev:turbopack` | Same port with **Turbopack** (faster on some setups; can error on Windows with `_buildManifest.js.tmp` ENOENT). |
+| `npm run dev:webpack` | Same as `dev` (alias). |
 | `npm run build` | Production build + `public/sw.js` |
 | `npm run start` | Run production server |
 | `npm run lint` | ESLint |
@@ -42,9 +43,9 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 
 ### If you see `500` on `/admin/...`, `/favicon.ico`, or `/manifest.webmanifest` on **3040**
 
-Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`** / similar chunk errors in the terminal). **Stop** the dev server (Ctrl+C), then either delete the `.next` folder manually or run **`npm run clean`**, then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** (Turbopack) or **`npm run dev:webpack:clean`** (Webpack). Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
+Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`** / similar chunk errors in the terminal). **Stop** the dev server (Ctrl+C), then either delete the `.next` folder manually or run **`npm run clean`**, then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** or **`npm run dev:webpack:clean`**. Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
 
-If **`Cannot find module './331.js'`** keeps coming back on **`npm run dev:webpack`**, try **`npm run dev`** (Turbopack) for local work — webpack dev + Fast Refresh on Windows is more likely to leave `.next` in a bad state.
+If **`Cannot find module './331.js'`** or chunk 404s persist after **`npm run clean`**, exclude the project or **`.next`** from real-time antivirus scanning, or move the repo to a path **without spaces** (e.g. `C:\dev\VISO`). If **`_buildManifest.js.tmp` ENOENT** appears with **`npm run dev:turbopack`**, use **`npm run dev`** (Webpack) instead.
 
 ### If **`layout.css` / `main-app.js` / `_next/static/chunks/...` 404** on **3040**
 

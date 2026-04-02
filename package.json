@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
-    "dev": "next dev -p 3040 --turbopack",
+    "dev": "next dev -p 3040",
+    "dev:turbopack": "next dev -p 3040 --turbopack",
     "dev:webpack": "next dev -p 3040",
     "dev:clean": "npm run clean && npm run dev",
+    "dev:turbopack:clean": "npm run clean && npm run dev:turbopack",
     "dev:webpack:clean": "npm run clean && npm run dev:webpack",
     "build": "next build",
     "start": "next start",
