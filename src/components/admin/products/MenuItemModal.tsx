@@ -93,6 +93,8 @@ export function MenuItemModal({
   const [preferWebpUpload, setPreferWebpUpload] = useState(true);
   const modalWasOpenRef = useRef(false);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
   useEffect(() => {
     if (!open) return;
@@ -111,7 +113,7 @@ export function MenuItemModal({
     const justOpened = !modalWasOpenRef.current;
     modalWasOpenRef.current = true;
 
-    onError(null);
+    onErrorRef.current(null);
     if (mode === "add") {
       if (justOpened) {
         setNameEn("");
@@ -151,7 +153,8 @@ export function MenuItemModal({
         : [newOptRow()],
     );
     if (justOpened) setNewCategoryLabel("");
-  }, [open, mode, product, names, descEn, existingOptions, optionNameEn, categories, onError]);
+    // onError omitted from deps on purpose: keep array length stable across HMR and use latest callback via ref.
+  }, [open, mode, product, names, descEn, existingOptions, optionNameEn, categories]);
 
   function addOptLine() {
     setOpts((prev) => [...prev, newOptRow()]);
