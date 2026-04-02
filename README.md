@@ -42,6 +42,8 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 
 Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`** / similar chunk errors in the terminal). **Stop** the dev server (Ctrl+C), then either delete the `.next` folder manually or run **`npm run clean`**, then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** (Turbopack) or **`npm run dev:webpack:clean`** (Webpack). Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
 
+If **`Cannot find module './331.js'`** keeps coming back on **`npm run dev:webpack`**, try **`npm run dev`** (Turbopack) for local work — webpack dev + Fast Refresh on Windows is more likely to leave `.next` in a bad state.
+
 ### If you see `500` on `http://localhost:3000`
 
 That URL is **not** this project unless you freed port 3000. Another process (often an old crashed dev server) can still be listening on **3000** and return **500** for `/` and `/favicon.ico`.
@@ -63,7 +65,7 @@ taskkill /PID <pid> /F
 
 ## Assets
 
-- **Logo:** `public/Logo.png` (main mark). Favicons: `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-*.png`, `src/app/favicon.ico`.
+- **Logo:** `public/Logo.png` (main mark). Favicons: **`public/favicon.ico`** (do not duplicate as `src/app/favicon.ico` — Next.js treats that as a conflict). Also `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `android-chrome-*.png`.
 - **Product images:** Either static files under `public/` (DB value like `/images/products/photo.webp`) or **Supabase Storage** bucket **`product-images`** (migration `20260204120007_storage_product_images.sql`). Staff can upload from **Admin → Menu**; optional **Convert to WebP** runs in the browser when the format supports it, otherwise the original file is uploaded. The storefront builds public URLs from `NEXT_PUBLIC_SUPABASE_URL` + the stored object key.
 
 ## PWA
