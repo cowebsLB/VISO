@@ -7,6 +7,7 @@ import {
   storageImageContentType,
 } from "@/lib/admin/prepare-image-upload";
 import { productImageUrl } from "@/lib/images/product-image-url";
+import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/product-images-bucket";
 import { uniqueSlug } from "@/lib/admin/slugify";
 import { useEffect, useRef, useState } from "react";
 
@@ -197,7 +198,7 @@ export function MenuItemModal({
       }
       const key = `menu/${crypto.randomUUID()}.${prepared.objectExt}`;
       const contentType = storageImageContentType(prepared);
-      const { error } = await supabase.storage.from("product-images").upload(key, prepared.blob, {
+      const { error } = await supabase.storage.from(PRODUCT_IMAGES_BUCKET).upload(key, prepared.blob, {
         contentType,
         cacheControl: "3600",
         upsert: false,
@@ -206,7 +207,7 @@ export function MenuItemModal({
         const msg = error.message;
         onError(
           msg.includes("Bucket not found") || msg.includes("not found")
-            ? `${msg} — run Supabase migration 20260204120007 (product-images bucket) or create the bucket in Dashboard.`
+            ? `${msg} — create bucket "${PRODUCT_IMAGES_BUCKET}" (or set NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET) and run migration 20260204120007 for RLS policies.`
             : msg,
         );
         return;
@@ -593,8 +594,10 @@ export function MenuItemModal({
               <strong>Save</strong> — saving alone does not send your file. You can instead type a path
               under <code className="rounded bg-slate-100 px-1">public/</code> (e.g.{" "}
               <code className="rounded bg-slate-100 px-1">/images/products/photo.webp</code>). Storage uses
-              bucket <code className="rounded bg-slate-100 px-1">product-images</code> (see migration{" "}
-              <code className="rounded bg-slate-100 px-1">20260204120007</code>).
+              bucket id <code className="rounded bg-slate-100 px-1">{PRODUCT_IMAGES_BUCKET}</code>{" "}
+              (migration <code className="rounded bg-slate-100 px-1">20260204120007</code> or match your
+              Dashboard name via <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_PRODUCT_IMAGES_BUCKET</code>
+              ).
             </p>
             <input
               id="menu-item-image-path"

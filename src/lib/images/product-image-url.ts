@@ -1,6 +1,5 @@
 import { publicAsset } from "@/lib/basePath";
-
-const BUCKET = "product-images";
+import { PRODUCT_IMAGES_BUCKET } from "@/lib/supabase/product-images-bucket";
 
 /** Default hero/cart image when path is missing or storage is unavailable. */
 export const PRODUCT_IMAGE_FALLBACK = "/images/products/plain-kaak.webp";
@@ -27,5 +26,5 @@ export function productImageUrl(imagePath: string | null | undefined): string {
     .map((seg) => encodeURIComponent(seg))
     .join("/");
 
-  return `${base}/storage/v1/object/public/${BUCKET}/${encodedKey}`;
+  return `${base}/storage/v1/object/public/${PRODUCT_IMAGES_BUCKET}/${encodedKey}`;
 }
