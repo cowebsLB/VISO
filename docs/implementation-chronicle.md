@@ -2,7 +2,7 @@
 
 This document reconstructs work from **the full Cursor conversation** that built and evolved the Anush Badar / VISO bakery site—not only the Supabase phase. It is intentionally long: **what you asked for**, **what broke**, **where it showed up**, **why**, and **what we changed**.
 
-**Source:** Agent transcript [`fb482a58-708f-4958-b5a5-cbde8dec7db3`](fb482a58-708f-4958-b5a5-cbde8dec7db3) (parent chat), plus repo state. Some assistant turns in the transcript are redacted; user questions and summarized outcomes are preserved.
+**Source:** Cursor agent transcript **fb482a58-708f-4958-b5a5-cbde8dec7db3** (parent chat), plus repo state. Some assistant turns in the transcript are redacted; user questions and summarized outcomes are preserved.
 
 ---
 
