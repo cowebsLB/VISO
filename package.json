@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "clean": "node -e \"require('fs').rmSync('.next',{recursive:true,force:true})\"",
+    "clean": "node scripts/clean-next.mjs",
     "dev": "next dev -p 3040",
     "dev:turbopack": "next dev -p 3040 --turbopack",
     "dev:webpack": "next dev -p 3040",
@@ -13,7 +13,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:storage-policies": "npx supabase db query -f supabase/migrations/20260204120007_storage_product_images.sql --linked"
   },
   "dependencies": {
     "@serwist/next": "^9.0.0",
