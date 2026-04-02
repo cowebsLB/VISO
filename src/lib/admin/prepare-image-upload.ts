@@ -5,6 +5,25 @@ export type PreparedUpload = {
   objectExt: string;
 };
 
+/** Storage buckets with `allowed_mime_types` reject `application/octet-stream`; map extension to an image/* type. */
+export function storageImageContentType(prepared: PreparedUpload): string {
+  if (prepared.contentType.startsWith("image/")) {
+    return prepared.contentType;
+  }
+  const map: Record<string, string> = {
+    webp: "image/webp",
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    svg: "image/svg+xml",
+    bmp: "image/bmp",
+    heic: "image/heic",
+    heif: "image/heif",
+  };
+  return map[prepared.objectExt] ?? "image/jpeg";
+}
+
 function extensionFromFilename(name: string): string {
   const base = name.split(/[/\\]/).pop() ?? "";
   const i = base.lastIndexOf(".");

@@ -2,7 +2,11 @@
 
 import { getStaffSupabase } from "@/lib/admin/staff-access";
 import { categoryMenuLabel } from "@/lib/admin/category-label";
-import { prepareImageForUpload } from "@/lib/admin/prepare-image-upload";
+import {
+  prepareImageForUpload,
+  storageImageContentType,
+} from "@/lib/admin/prepare-image-upload";
+import { productImageUrl } from "@/lib/images/product-image-url";
 import { uniqueSlug } from "@/lib/admin/slugify";
 import { useEffect, useRef, useState } from "react";
 
@@ -91,6 +95,7 @@ export function MenuItemModal({
   const [addingCategory, setAddingCategory] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [preferWebpUpload, setPreferWebpUpload] = useState(true);
+  const [imageUploadHint, setImageUploadHint] = useState<string | null>(null);
   const modalWasOpenRef = useRef(false);
   const imageFileInputRef = useRef<HTMLInputElement>(null);
   const onErrorRef = useRef(onError);
@@ -138,6 +143,7 @@ export function MenuItemModal({
     setIsActive(product.is_active);
     setWeightKg(String(product.weight_per_sale_unit_kg));
     setImagePath(product.image_path ?? "");
+    setImageUploadHint(null);
     const sorted = [...existingOptions].sort(
       (a, b) => a.sort_order - b.sort_order || a.id.localeCompare(b.id),
     );
@@ -173,6 +179,7 @@ export function MenuItemModal({
     e.target.value = "";
     if (!file) return;
     onError(null);
+    setImageUploadHint(null);
     const access = await getStaffSupabase();
     if (!access.ok) {
       onError(access.message);
@@ -181,20 +188,31 @@ export function MenuItemModal({
     const { supabase } = access;
     setUploadingImage(true);
     try {
-      const prepared = await prepareImageForUpload(file, { preferWebp: preferWebpUpload });
+      let prepared;
+      try {
+        prepared = await prepareImageForUpload(file, { preferWebp: preferWebpUpload });
+      } catch (err) {
+        onError(err instanceof Error ? err.message : "Could not read that image file.");
+        return;
+      }
       const key = `menu/${crypto.randomUUID()}.${prepared.objectExt}`;
-      const contentType = prepared.contentType.startsWith("image/")
-        ? prepared.contentType
-        : "image/jpeg";
+      const contentType = storageImageContentType(prepared);
       const { error } = await supabase.storage.from("product-images").upload(key, prepared.blob, {
         contentType,
+        cacheControl: "3600",
         upsert: false,
       });
       if (error) {
-        onError(error.message);
+        const msg = error.message;
+        onError(
+          msg.includes("Bucket not found") || msg.includes("not found")
+            ? `${msg} — run Supabase migration 20260204120007 (product-images bucket) or create the bucket in Dashboard.`
+            : msg,
+        );
         return;
       }
       setImagePath(key);
+      setImageUploadHint("Photo uploaded — click Save to store it on this item.");
     } finally {
       setUploadingImage(false);
     }
@@ -571,19 +589,46 @@ export function MenuItemModal({
           <div>
             <span className="block text-sm font-medium text-slate-700">Photo (optional)</span>
             <p className="mt-0.5 text-xs text-slate-500">
-              Use a path under <code className="rounded bg-slate-100 px-1">public/</code> or upload to
-              Supabase Storage (bucket <code className="rounded bg-slate-100 px-1">product-images</code>
-              ). After upload, the stored value looks like{" "}
-              <code className="rounded bg-slate-100 px-1">menu/&lt;id&gt;.webp</code>.
+              Click <strong>Upload image…</strong> and choose a file (upload runs immediately). Then click{" "}
+              <strong>Save</strong> — saving alone does not send your file. You can instead type a path
+              under <code className="rounded bg-slate-100 px-1">public/</code> (e.g.{" "}
+              <code className="rounded bg-slate-100 px-1">/images/products/photo.webp</code>). Storage uses
+              bucket <code className="rounded bg-slate-100 px-1">product-images</code> (see migration{" "}
+              <code className="rounded bg-slate-100 px-1">20260204120007</code>).
             </p>
             <input
               id="menu-item-image-path"
               value={imagePath}
-              onChange={(e) => setImagePath(e.target.value)}
+              onChange={(e) => {
+                setImagePath(e.target.value);
+                setImageUploadHint(null);
+              }}
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
               placeholder="/images/products/photo.webp"
               aria-label="Photo path or storage key"
             />
+            {imagePath.trim() && !imagePath.trim().startsWith("/") && (
+              <div className="mt-2 flex items-start gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element -- small preview; remote Supabase URL */}
+                <img
+                  src={productImageUrl(imagePath.trim())}
+                  alt=""
+                  className="h-14 w-14 shrink-0 rounded-lg border border-slate-200 bg-slate-100 object-cover"
+                  onError={(ev) => {
+                    ev.currentTarget.style.visibility = "hidden";
+                  }}
+                />
+                <p className="text-xs text-slate-500">
+                  Preview uses your <code className="rounded bg-slate-100 px-1">NEXT_PUBLIC_SUPABASE_URL</code>.
+                  If this is blank or broken, check the bucket is public and the migration ran.
+                </p>
+              </div>
+            )}
+            {imageUploadHint && (
+              <p className="mt-2 text-sm font-medium text-emerald-700" role="status">
+                {imageUploadHint}
+              </p>
+            )}
             <input
               ref={imageFileInputRef}
               type="file"

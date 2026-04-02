@@ -5,7 +5,6 @@ import { categoryMenuLabel } from "@/lib/admin/category-label";
 import { publicAsset } from "@/lib/basePath";
 import { productImageUrl } from "@/lib/images/product-image-url";
 import { hasSupabaseEnv } from "@/lib/supabase/client";
-import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MenuItemModal,
@@ -44,12 +43,12 @@ function Thumb({ path }: { path: string | null }) {
     setSrc(desired);
   }, [desired]);
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element -- admin list; Supabase public URLs avoid next/image remote quirks in dev
+    <img
       src={src}
       alt=""
       width={44}
       height={44}
-      unoptimized
       className="h-11 w-11 rounded-lg border border-slate-200 bg-slate-50 object-cover"
       onError={() => setSrc(fallback)}
     />
