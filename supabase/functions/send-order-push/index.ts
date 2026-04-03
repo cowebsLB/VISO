@@ -27,6 +27,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/** Prefer Authorization header; fall back to ?Authorization=… when Dashboard sends it as HTTP Parameters (pg_net). */
+function getWebhookBearer(req: Request): string {
+  const header = req.headers.get("Authorization")?.trim();
+  if (header) return header;
+  try {
+    const u = new URL(req.url);
+    const q =
+      u.searchParams.get("Authorization") ?? u.searchParams.get("authorization");
+    if (q) return q.trim().replace(/\s+/g, " ");
+  } catch {
+    /* ignore */
+  }
+  return "";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -40,7 +55,7 @@ Deno.serve(async (req) => {
   }
 
   const webhookSecret = Deno.env.get("ORDER_PUSH_WEBHOOK_SECRET");
-  const auth = req.headers.get("Authorization") ?? "";
+  const auth = getWebhookBearer(req);
   if (!webhookSecret || auth !== `Bearer ${webhookSecret}`) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,

@@ -20,7 +20,7 @@ The script will:
 
 Then **you** do **one** thing in the browser: **Supabase Dashboard → Integrations → Webhooks** (not under Database — UI moved). Or open  
 `https://supabase.com/dashboard/project/<YOUR_PROJECT_REF>/integrations/webhooks/overview`.  
-Create a webhook on table **`orders`**, event **Insert**, URL **`https://<project-ref>.supabase.co/functions/v1/send-order-push`** (full path — the UI can clip; must end with **`send-order-push`**), method **POST**, header **`Authorization: Bearer <secret>`** plus **`Content-Type: application/json`** (the script prints the exact values at the end). **`ORDER_PUSH_WEBHOOK_SECRET`** is also in **`supabase/.push-setup-secrets.env`** locally (gitignored); Dashboard secrets are not shown again after save.
+Create a webhook on table **`orders`**, event **Insert**, URL **`https://<project-ref>.supabase.co/functions/v1/send-order-push`** (full path — the UI can clip; must end with **`send-order-push`**), method **POST**. Under **HTTP Headers**, add **`Authorization`** = **`Bearer <secret>`** and **`Content-type`** = **`application/json`**. Do **not** put `Authorization` under **HTTP Parameters** — that sends it as a query string (`?Authorization=…`), and the function returns **401** because it only reads the **`Authorization` header**.
 
 Add **`NEXT_PUBLIC_VAPID_PUBLIC_KEY`** to **`.env.local`** (and GitHub Actions secret for Pages) using the line the script prints. Remove or protect **`supabase/.push-setup-secrets.env`** afterward (gitignored).
 

@@ -89,12 +89,13 @@ After deploy, the function URL is:
      - If HTTP: URL = `https://<PROJECT_REF>.supabase.co/functions/v1/send-order-push`
    - **HTTP Headers:** add  
      `Authorization` = `Bearer <ORDER_PUSH_WEBHOOK_SECRET>`  
-     (use the **exact** same secret as in Edge secrets).
+     (use the **exact** same secret as in Edge secrets). Optionally **`Content-type`** = **`application/json`**.
+   - Prefer **HTTP Headers** for `Authorization`. If you only have **HTTP Parameters**, the URL becomes `?Authorization=Bearer+…`; the Edge Function accepts that as a **fallback** (same `Bearer <secret>` value), but it is worse for privacy (secret can appear in logs). Move to **headers** when the UI allows.
 3. Save.
 
 If the dashboard offers “invoke Edge Function” with built-in auth, prefer that only if it sends the same Bearer token your function expects; otherwise use HTTP POST with the header above.
 
-The function returns **401** if the Bearer token does not match **`ORDER_PUSH_WEBHOOK_SECRET`**.
+The function returns **401** if the header is missing, wrong, or the token does not match **`ORDER_PUSH_WEBHOOK_SECRET`**.
 
 ---
 
@@ -127,7 +128,7 @@ Redeploy the static site after changing secrets.
 |--------|----------------|
 | Cannot find Webhooks in Dashboard | Use **Integrations → Webhooks**, not **Database** (Studio UI). |
 | 404 from function | Webhook URL must end **`/functions/v1/send-order-push`** (full name; easy to truncate in the form). |
-| 401 from function | Webhook **Authorization** header must be `Bearer ` + same value as `ORDER_PUSH_WEBHOOK_SECRET`. |
+| 401 from function | **`Authorization` must be an HTTP header**, not a query parameter. If logs show `?Authorization=Bearer+…` on the URL, you used **HTTP Parameters** in the webhook form — remove it there and add a header **`Authorization`** = **`Bearer <secret>`**. Must match **`ORDER_PUSH_WEBHOOK_SECRET`** in Edge secrets exactly. |
 | No notification, function 200 | No rows in **`admin_push_subscriptions`** — enable notifications in admin on a **production** URL with VAPID set. |
 | Push shows but wrong link | Set **`ORDER_PUSH_SITE_URL`** to your real public origin + base path (e.g. GitHub Pages `/VISO`). |
 | “Push not active” in UI | Open browser devtools → Network/Console; often RLS or missing migration. Confirm your user is in **`public.admins`**. |
