@@ -27,7 +27,7 @@ Use **digits only** for WhatsApp (country code + number, no `+`). Supabase **ano
 
 **`NEXT_PUBLIC_BASE_PATH`:** fine to keep `/VISO` in `.env.local` for production parity — **`next dev` ignores it** unless you set `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`. Otherwise you would have to open `http://localhost:3040/VISO/...` and mismatched asset URLs cause **`_next/static/...` 404** on `/admin/login`.
 
-Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. **Documentation hub:** **`docs/index.md`**. Auth and `admins` rows: **`docs/seed-admins.md`**. Catalog, Storage, RLS: **`docs/catalog-storage-and-staff.md`**. Login behavior: **`docs/admin-auth-and-login.md`**.
+Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. **Documentation hub:** **`docs/index.md`**. Auth and `admins` rows: **`docs/seed-admins.md`**. Catalog, Storage, RLS: **`docs/catalog-storage-and-staff.md`**. Login behavior: **`docs/admin-auth-and-login.md`**. Background order push (Web Push): after `supabase link`, run **`npm run supabase:setup-order-push`** (see **`docs/supabase-step-by-step.md`**).
 
 ## Scripts
 
@@ -52,9 +52,10 @@ If **`Cannot find module './331.js'`** / **`./124.js`** or chunk 404s persist af
 ### If **`layout.css` / `main-app.js` / `_next/static/chunks/...` 404** on **3040**
 
 1. **Stop** the dev server → **`npm run clean`** → start dev again → **hard refresh** (Ctrl+Shift+R) or DevTools **Disable cache**.
-2. **Service worker + Cache storage:** after visiting a **static export** preview (`serve out`) or **production**, Serwist can leave **`sw.js`** and **Cache storage** entries that intercept **`/_next/static/*`** on **`localhost`** (stale precache → chunk **404**, especially on **`/admin/...`**). On each **`npm run dev`** load, the app **unregisters service workers** and **deletes all Cache Storage** for `localhost` / `127.0.0.1`. If errors persist, DevTools → **Application** → **Service workers** → **Unregister**, then **Cache storage** → delete site entries → hard reload (you may need **two** reloads so the first pass clears caches).
-3. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`); otherwise **`/_next/static/...` 404** is common.
-4. Messages like **`content.js`** / “Feature is disabled” usually come from a **browser extension**, not this repo.
+2. **Service worker + Cache storage:** after visiting a **static export** preview (`serve out`) or **production**, Serwist (or the **admin** worker) can leave registrations and **Cache storage** entries that intercept **`/_next/static/*`** on **`localhost`** (stale precache → chunk **404** for **`layout.css`**, **`main-app.js`**, etc.). **`LocalhostPwaCacheBustScript`** in **`layout.tsx`** runs **in `<head>` before module scripts**: it **async** unregisters workers and clears caches, then **reloads** (up to **2×** per tab) when anything was removed so the next load is not controlled by a stale worker. **`ClientProviders`** repeats cleanup on hydrate. Production hostnames are unchanged.
+3. **Still 404 after reload:** **`next build`** leaves **hashed** chunks under **`.next`** while **`next dev`** expects names like **`main-app.js`** — a mixed cache causes **real** dev-server 404s. **Stop** the dev server (**Ctrl+C**), run **`npm run clean`**, then **`npm run dev`** and wait for **Ready** before opening the browser.
+4. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`); otherwise **`/_next/static/...` 404** is common.
+5. Messages like **`content.js`** / “Feature is disabled” usually come from a **browser extension**, not this repo.
 
 ### If you see `500` on `http://localhost:3000`
 

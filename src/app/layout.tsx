@@ -1,4 +1,5 @@
 import { ClientProviders } from "@/components/ClientProviders";
+import { LocalhostPwaCacheBustScript } from "@/components/LocalhostPwaCacheBustScript";
 import {
   Fraunces,
   Noto_Sans,
@@ -8,9 +9,9 @@ import {
 import type { Metadata, Viewport } from "next";
 import { BRAND_DESCRIPTION, BRAND_NAME, BRAND_SITE_NAME } from "@/lib/brand";
 import { publicAsset, siteUrl } from "@/lib/basePath";
+import "./globals.css";
 
 const manifestHref = publicAsset("/manifest.webmanifest");
-import "./globals.css";
 
 const display = Fraunces({
   subsets: ["latin"],
@@ -106,6 +107,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
+        <LocalhostPwaCacheBustScript />
         {process.env.NEXT_PUBLIC_BUILD_ID ? (
           <meta name="build-id" content={process.env.NEXT_PUBLIC_BUILD_ID} />
         ) : null}

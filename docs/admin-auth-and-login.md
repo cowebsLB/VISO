@@ -38,7 +38,15 @@ Staff routes under **`/admin`** use Supabase Auth (email/password) with RLS poli
 
 ## Order notifications (admin)
 
-In **production** (service worker enabled), staff can turn on **order notifications** from the bar below the admin nav. The page asks for **Notification** permission, then **polls** for new rows in **`orders`** every 45 seconds (only while the tab is open). The **same Serwist service worker** (`src/app/sw.ts`) shows the notification via a **`message`** handler; **`notificationclick`** focuses an open `/admin` tab or opens **Orders**. In **`next dev`**, Serwist is disabled (`ClientProviders`), so a short notice is shown instead—use **`npm run build`** + **`npm run start`** to test notifications locally.
+In **production** (service worker enabled), staff can turn on **order notifications** from the bar below the admin nav. The page asks for **Notification** permission. If **`NEXT_PUBLIC_VAPID_PUBLIC_KEY`** is set and Supabase push is configured, the device **registers Web Push** and **background** alerts are sent via an Edge Function when **`orders`** rows are inserted; otherwise the app **polls** **`orders`** every 45 seconds **only while the tab is open**. On **`/admin`** routes the **admin** worker (`public/admin/sw.js`, nested scope `…/admin/`) handles **`push`** events and **`SITE_SHOW_NOTIFICATION`** messages; the storefront uses Serwist (`src/app/sw.ts`). **`notificationclick`** focuses an open `/admin` tab or opens **Orders**. In **`next dev`**, service workers are disabled (`ClientProviders`), so a short notice is shown instead—use **`npm run build`** + **`npm run start`** to test notifications locally.
+
+Step-by-step Supabase setup: [admin-push-notifications.md](./admin-push-notifications.md).
+
+## Admin PWA (nested scope, same deploy)
+
+- **Manifest:** `public/admin/manifest.webmanifest` (relative **`start_url`** / **`scope`**: `./` under `…/admin/`). **`src/app/admin/layout.tsx`** sets **`metadata.manifest`** and staff **`appleWebApp`** title so “Add to Home Screen” installs an app that opens **`/admin/`**.
+- **Service worker:** `public/admin/sw.js` — no Serwist precache (network by default); includes the same **push-style** **`message`** / **`notificationclick`** handlers as the main worker for staff notifications.
+- **Registration:** `ClientProviders` registers **Serwist** only on **non-admin** routes; on **`/admin`** it calls **`navigator.serviceWorker.register(.../admin/sw.js, { scope: …/admin/ })`**. Unmounting the storefront Serwist wrapper clears **`window.serwist`** so switching between site and admin does not leave a stale singleton.
 
 ## Related
 

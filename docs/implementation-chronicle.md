@@ -415,5 +415,30 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **v2:** Full multi-phase chat narrative + merged technical detail.
 - **v3:** Part I (2 Apr 2026 admin + docs); split reference docs under **`docs/`** with **`docs/index.md`**.
 - **v4:** Part J (3 Apr 2026 branding, PWA, dev cache, orders cards).
+- **v5:** Part K (admin Web Push + Supabase automation + dashboard path).
+
+## Part K — Admin background push and Supabase ops (early Apr 2026)
+
+### K.1 Requirement
+
+- **Ask:** Order notifications for admin **in the background** when the PWA is installed; earlier implementation only **polled** while the tab was open.
+- **Outcome:** **Web Push** via **Supabase Edge Function** `send-order-push` on **`orders` INSERT**; **`admin_push_subscriptions`** table + RLS; **`public/admin/sw.js`** `push` handler; client **`syncAdminPushSubscription`** / **`removeAdminPushSubscription`**; polling disabled when push is registered.
+
+### K.2 Next.js dev vs static export
+
+- **Symptom:** **`/_next/static/...` 404** and hydration issues when **`output: "export"`** was active during **`next dev`** (dev HTML vs hashed prod chunks).
+- **Fix:** **`next.config.ts`:** apply **`output: "export"`** only when **`argv` / npm lifecycle** is **`build`** or **`start`** — not during **`next dev`**. **`LocalhostPwaCacheBustScript`** in **`<head>`** plus **`ClientProviders`** cleanup for stale SW/cache on localhost.
+
+### K.3 Empty `NEXT_PUBLIC_SITE_URL` → 500
+
+- **Symptom:** **`GET /` and `/admin` 500**; React minified **#418** (hydration) because server error HTML did not match client bundle.
+- **Cause:** **`.env.local`** had **`NEXT_PUBLIC_SITE_URL=`** (empty); **`??` fallback** did not run; **`metadataBase: new URL("/")`** threw in **`RootLayout`**.
+- **Fix:** **`src/lib/basePath.ts`:** **`resolveSiteUrl()`** — trim, treat empty as unset, **`try/catch`** on **`new URL`** with safe default.
+
+### K.4 Supabase automation and dashboard UX
+
+- **`scripts/supabase-setup-order-push.mjs`** + **`npm run supabase:setup-order-push`:** generates VAPID + webhook secret, **`supabase secrets set --env-file`**, **`db push`**, **`functions deploy send-order-push`**. **`web-push`** devDependency; **`supabase/.push-setup-secrets.env`** gitignored.
+- **Docs:** **`docs/admin-push-notifications.md`**, **`docs/supabase-step-by-step.md`**; **Database Webhooks** primary path is **Integrations → Webhooks** (not **Database** sidebar); direct URL pattern **`/integrations/webhooks/overview`**.
+- **Webhook pitfalls:** URL must end **`…/send-order-push`** (full name); **`Authorization: Bearer <ORDER_PUSH_WEBHOOK_SECRET>`** header required; secret readable from generated **`.push-setup-secrets.env`** locally (not shown again in Dashboard).
 
 *Compiled from session transcript and repo state — April 2026.*

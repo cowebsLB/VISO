@@ -1,10 +1,30 @@
 import { AdminAuthGate } from "@/components/admin/AdminAuthGate";
-import type { Metadata } from "next";
+import { BRAND_NAME } from "@/lib/brand";
+import { publicAsset } from "@/lib/basePath";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
+const adminManifestHref = publicAsset("/admin/manifest.webmanifest");
+
 export const metadata: Metadata = {
-  title: "Admin",
+  manifest: adminManifestHref,
+  title: {
+    default: "Admin",
+    template: `%s — ${BRAND_NAME} Staff`,
+  },
+  applicationName: `${BRAND_NAME} Staff`,
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: `${BRAND_NAME} Staff`,
+  },
   robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#64748b" }],
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

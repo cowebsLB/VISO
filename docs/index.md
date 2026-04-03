@@ -7,6 +7,7 @@ Technical reference for the **Anush Badar** bakery site: Next.js storefront, Sup
 | Doc | What it covers |
 |-----|----------------|
 | [README.md](../README.md) (repo root) | Install, env vars, scripts, troubleshooting for dev/build |
+| [supabase-step-by-step.md](./supabase-step-by-step.md) | **Web Push:** `npm run supabase:setup-order-push` (+ one Dashboard webhook); fix-it links |
 | [seed-admins.md](./seed-admins.md) | Creating Auth users, `public.admins` rows, staff access |
 | [catalog-storage-and-staff.md](./catalog-storage-and-staff.md) | Live catalog fetch, product images, Storage, RLS / staff checks |
 
@@ -31,10 +32,12 @@ Technical reference for the **Anush Badar** bakery site: Next.js storefront, Sup
 | [implementation-chronicle.md](./implementation-chronicle.md) | Long-form timeline of major phases, errors, and fixes |
 | [Worklog-02-04-2026.md](./Worklog-02-04-2026.md) | Daily worklog: admin inventory, auth, recipes, docs restructure (2 Apr 2026) |
 | [Worklog-03-04-2026.md](./Worklog-03-04-2026.md) | Daily worklog: Anush Badar branding, PWA/dev cache, staff notifs, orders cards (3 Apr 2026) |
+| [Worklog-04-04-2026.md](./Worklog-04-04-2026.md) | Web Push + Supabase setup script, docs, dev/export and `siteUrl` fixes (4 Apr 2026) |
 
 ## Database and migrations
 
-- SQL migrations live under **`supabase/migrations/`** (core schema, RLS, RPCs, seed catalog, storage policies).
+- SQL migrations live under **`supabase/migrations/`** (core schema, RLS, RPCs, seed catalog, storage policies, admin push subscriptions).
+- Web Push automation: **[supabase-step-by-step.md](./supabase-step-by-step.md)** (`npm run supabase:setup-order-push`).
 - Operational notes for staff and RLS are duplicated in context in **catalog-storage-and-staff.md** and **admin-** docs where relevant.
 
 ## Conventions

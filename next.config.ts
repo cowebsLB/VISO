@@ -17,6 +17,18 @@ function effectiveBasePath(): string {
 
 const basePath = effectiveBasePath();
 
+/**
+ * `output: "export"` is required for `next build` (GitHub Pages), but with it enabled while
+ * running `next dev`, webpack emits production-style hashed chunks while the dev HTML still
+ * requests `main-app.js`, `layout.css`, etc. → 404. Enable static export only for build.
+ */
+/** `start` must match a prior `build` that used `output: "export"`. */
+const useStaticExport =
+  process.argv.includes("build") ||
+  process.argv.includes("start") ||
+  process.env.npm_lifecycle_event === "build" ||
+  process.env.npm_lifecycle_event === "start";
+
 function supabaseStorageRemotePattern():
   | { protocol: "https"; hostname: string; pathname: string }
   | undefined {
@@ -42,12 +54,10 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
-  output: "export",
+  ...(useStaticExport ? { output: "export" as const } : {}),
   outputFileTracingRoot: path.join(__dirname),
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
-  // Windows dev: segment explorer + webpack can throw "React Client Manifest" / missing chunks
-  // after a corrupt .next; disabling avoids cascading 500s until cache is cleaned.
   experimental: {
     devtoolSegmentExplorer: false,
   },
@@ -58,8 +68,6 @@ const nextConfig: NextConfig = {
       return p ? [p] : [];
     })(),
   },
-  // Windows: webpack persistent cache can corrupt (ENOENT chunks / manifest) when .next is
-  // cleared mid-dev or antivirus locks files; disabling dev cache avoids bad chunk refs.
   webpack: (config, { dev }) => {
     if (dev) {
       config.cache = false;

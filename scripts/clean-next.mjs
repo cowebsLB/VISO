@@ -14,3 +14,9 @@ for (const dir of paths) {
     process.exitCode = 1;
   }
 }
+
+if (!process.exitCode) {
+  console.log(
+    "Next: stop any dev server on this repo, then npm run dev. If layout.css / main-app.js still 404, hard-reload once after SW purge or check NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV vs your URL.",
+  );
+}

@@ -4,6 +4,11 @@ import { getStaffSupabase } from "@/lib/admin/staff-access";
 import { BRAND_NAME } from "@/lib/brand";
 import { postShowNotificationViaSw } from "@/lib/notifications/post-sw-notification";
 import { publicAsset } from "@/lib/basePath";
+import {
+  getVapidPublicKey,
+  removeAdminPushSubscription,
+  syncAdminPushSubscription,
+} from "@/lib/push/admin-web-push";
 import { hasSupabaseEnv } from "@/lib/supabase/client";
 import { useCallback, useEffect, useState } from "react";
 
@@ -39,6 +44,8 @@ const POLL_MS = 45_000;
 export function StaffOrderNotifications() {
   const [swReady, setSwReady] = useState(false);
   const [enabled, setEnabled] = useState(false);
+  const [pushRegistered, setPushRegistered] = useState(false);
+  const [pushError, setPushError] = useState<string | null>(null);
   const [permission, setPermission] = useState<NotificationPermission | "unsupported">("default");
 
   useEffect(() => {
@@ -60,6 +67,39 @@ export function StaffOrderNotifications() {
     if (!("serviceWorker" in navigator)) return;
     void navigator.serviceWorker.ready.then(() => setSwReady(true));
   }, []);
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === "development") return;
+    if (!enabled || permission !== "granted" || !swReady) {
+      setPushRegistered(false);
+      setPushError(null);
+      return;
+    }
+    if (!getVapidPublicKey()) {
+      setPushRegistered(false);
+      setPushError(null);
+      return;
+    }
+
+    let cancelled = false;
+    void (async () => {
+      const access = await getStaffSupabase();
+      if (!access.ok || cancelled) return;
+      const res = await syncAdminPushSubscription(access.supabase);
+      if (cancelled) return;
+      if (res.ok) {
+        setPushRegistered(true);
+        setPushError(null);
+      } else {
+        setPushRegistered(false);
+        setPushError(res.message);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, permission, swReady]);
 
   const checkNewOrders = useCallback(async () => {
     if (!hasSupabaseEnv()) return;
@@ -133,10 +173,11 @@ export function StaffOrderNotifications() {
   useEffect(() => {
     if (process.env.NODE_ENV === "development") return;
     if (!enabled || permission !== "granted" || !swReady) return;
+    if (pushRegistered && getVapidPublicKey()) return;
     void checkNewOrders();
     const id = window.setInterval(() => void checkNewOrders(), POLL_MS);
     return () => window.clearInterval(id);
-  }, [enabled, permission, swReady, checkNewOrders]);
+  }, [enabled, permission, swReady, pushRegistered, checkNewOrders]);
 
   async function enableNotifications() {
     if (permission === "unsupported") return;
@@ -156,7 +197,15 @@ export function StaffOrderNotifications() {
     }
   }
 
-  function disable() {
+  async function disable() {
+    if (getVapidPublicKey()) {
+      const access = await getStaffSupabase();
+      if (access.ok) {
+        await removeAdminPushSubscription(access.supabase);
+      }
+    }
+    setPushRegistered(false);
+    setPushError(null);
     setEnabled(false);
     try {
       localStorage.setItem(STORAGE_ENABLED, "0");
@@ -204,12 +253,18 @@ export function StaffOrderNotifications() {
           {permission === "granted" && enabled && (
             <>
               <span className="text-xs text-slate-600">
-                {swReady ? `On · checking every ${POLL_MS / 1000}s` : "Waiting for service worker…"}
+                {!swReady && "Waiting for service worker…"}
+                {swReady && pushRegistered && "On · background push (works when app is closed)"}
+                {swReady &&
+                  !pushRegistered &&
+                  getVapidPublicKey() &&
+                  (pushError ? `Push not active: ${pushError}` : "Registering push…")}
+                {swReady && !pushRegistered && !getVapidPublicKey() && `On · checking every ${POLL_MS / 1000}s`}
               </span>
               <button
                 type="button"
                 className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-800 hover:bg-slate-50"
-                onClick={disable}
+                onClick={() => void disable()}
               >
                 Turn off
               </button>
