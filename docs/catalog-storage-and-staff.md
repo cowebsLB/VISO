@@ -1,5 +1,7 @@
 # Public catalog, product images, and staff checks
 
+**Documentation index:** [docs/index.md](./index.md)
+
 How the storefront loads menu data, how image paths resolve, and how staff verification interacts with RLS.
 
 ## Public catalog (database)

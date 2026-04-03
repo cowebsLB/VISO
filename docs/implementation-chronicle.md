@@ -326,7 +326,9 @@ This document reconstructs work from **the full Cursor conversation** that built
 | Turbopack `ssr/[turbopack]_runtime.js` missing | Mixed Serwist Webpack + Turbopack + stale `.next` | Delete `.next`, use Webpack dev |
 | `Cannot find module './NNN.js'` | Corrupt `.next` | Stop dev → `npm run clean` → dev |
 | `SegmentViewNode` / client manifest | Next devtools + bad cache | Clean + `devtoolSegmentExplorer: false` |
-| Login 400 | Wrong password / unconfirmed user | Supabase Auth settings |
+| Login 400 | Wrong password / unconfirmed user / email mismatch (Gmail user but typed short name only) | Use **full email** as in Auth, or synthetic **`user@viso-admin.local`**; confirm email in Dashboard |
+| Stay on login after success | Auth listener did not navigate on SIGNED_IN | Fixed in **`AdminAuthGate`** + **`router.replace`** after sign-in |
+| Logout 403 (`scope=global`) | Anon client + global revoke | Use **`signOut({ scope: "local" })`** |
 | Multiple GoTrueClient | Many `createClient` calls | Singleton in `client.ts` |
 | RPC 403 / order not inserted | RLS + INVOKER / missing migration | Migrations **004–006** applied in order |
 | Orders list empty | No `admins` row for your UUID | `INSERT INTO admins ...` |
@@ -355,12 +357,53 @@ This document reconstructs work from **the full Cursor conversation** that built
 | Next config | `next.config.ts` |
 | Migrations | `supabase/migrations/*.sql` |
 | Pages deploy | `.github/workflows/deploy-pages.yml` |
+| Staff login / auth gate | `src/app/admin/login/page.tsx`, `src/components/admin/AdminAuthGate.tsx`, `src/components/admin/AdminUserMenu.tsx`, `src/lib/admin/staff-email.ts` |
+| Inventory admin | `src/app/admin/(shell)/inventory/page.tsx` |
+| Recipes / BOM admin | `src/app/admin/(shell)/recipes/page.tsx` |
+| Next cache clean | `scripts/clean-next.mjs`, `npm run clean` |
+
+---
+
+## Part I — Admin UX and docs split (2 April 2026)
+
+### I.1 Inventory admin (full CRUs + stock)
+
+- **Symptom:** Inventory page was essentially an “adjustment” strip and a table with no add/edit/remove; staff could not manage ingredients or understand how stock should change.
+- **Outcome:** **Add ingredient** (modal with starting quantity, cost, unit, optional category and low threshold), **Edit** (metadata only; on-hand edited via **Update stock**), **Update stock** (modal calling **`adjust_inventory`** with human-readable reasons), **Remove** (delete with FK hint if still referenced from **`recipe_lines`**). All loads and mutations use **`getStaffSupabase()`**; mutations use **`withStaff`** returning **`"ok" | "staff" | "fail"`** and **`SupabaseClient`** typing (no broken **`runWithStaff`** reference after refactor).
+
+### I.2 Login redirect and Gmail-friendly sign-in
+
+- **Symptom:** After correct password, user stayed on **`/admin/login`** until a full reload; **400** on **`/auth/v1/token`** when Auth users were created with **Gmail** (or any real email) but the UI only sent **`shortname@viso-admin.local`**.
+- **Cause:** **`AdminAuthGate`** `onAuthStateChange` only redirected **unauthenticated** users to login, not **authenticated** users away from login; email mapping assumed synthetic domain only.
+- **Fix:** **`router.replace("/admin")`** after successful **`signInWithPassword`**; gate listener also **`replace("/admin")`** when **`session && isLogin`**. **`resolveStaffAuthEmail`:** if input contains **`@`**, use trimmed lowercase full email; else **`username@viso-admin.local`**. Clearer UI copy (“Email or username”, placeholder **`you@gmail.com`**) and errors (wrong email/password, email not confirmed).
+
+### I.3 Sign-out 403
+
+- **Symptom:** **`POST .../auth/v1/logout?scope=global`** returned **403** in the console.
+- **Fix:** **`signOut({ scope: "local" })`** in **`AdminUserMenu`** so the client session clears without relying on that endpoint with the anon key.
+
+### I.4 Recipes (BOM) readability and CRUD
+
+- **Symptom:** Flat table of **`product_id`** / option id slugs; repeated rows; no way to add lines in-app.
+- **Outcome:** Grouped **cards** by product (English name from **`product_i18n`**) and **variant** (from **`product_option_i18n`** + **`product_options.sort_order`**); ingredient names and units; **Add ingredient** / **Edit** / **Remove** modals writing **`recipe_lines`**; friendly message on **`recipe_lines_unique_bom`** duplicate; default new row to **first variant** when options exist; **“Fallback”** option maps to **`product_option_id` null**, matching **`private.apply_order_to_inventory`** (variant-specific BOM when present, else shared null-option lines). Loads all **`products`** for the product dropdown even if no lines exist yet.
+
+### I.5 Dev stability (Windows)
+
+- **`next.config.ts`:** **`experimental.devtoolSegmentExplorer: false`** to reduce segment-explorer / client-manifest noise after bad **`.next`** cache.
+- **`scripts/clean-next.mjs`:** removes **`.next`** and **`node_modules/.cache`**; wired as **`npm run clean`** (already in **package.json** from prior commit).
+
+### I.6 Documentation restructure
+
+- **`docs/index.md`:** Hub linking all topic docs.
+- **New:** **`admin-auth-and-login.md`**, **`admin-inventory.md`**, **`admin-recipes-bom.md`**, **`dev-environment-windows.md`**, **`Worklog-02-04-2026.md`**.
+- **Updated:** **`seed-admins.md`** (Gmail / full-email login); **`catalog-storage-and-staff.md`** (pointer to index); this chronicle (**Part I**, file map, error table).
 
 ---
 
 ## Revision
 
 - **v1:** Supabase-focused chronicle.
-- **v2 (this file):** Full multi-phase chat narrative + merged technical detail.
+- **v2:** Full multi-phase chat narrative + merged technical detail.
+- **v3:** Part I (2 Apr 2026 admin + docs); split reference docs under **`docs/`** with **`docs/index.md`**.
 
 *Compiled from session transcript and repo state — April 2026.*

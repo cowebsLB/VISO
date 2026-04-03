@@ -27,7 +27,7 @@ Use **digits only** for WhatsApp (country code + number, no `+`). Supabase **ano
 
 **`NEXT_PUBLIC_BASE_PATH`:** fine to keep `/VISO` in `.env.local` for production parity — **`next dev` ignores it** unless you set `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`. Otherwise you would have to open `http://localhost:3040/VISO/...` and mismatched asset URLs cause **`_next/static/...` 404** on `/admin/login`.
 
-Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. See **`docs/seed-admins.md`** (Auth + `admins` rows) and **`docs/catalog-storage-and-staff.md`** (live catalog fetch, Storage bucket, staff/RLS notes).
+Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. **Documentation hub:** **`docs/index.md`**. Auth and `admins` rows: **`docs/seed-admins.md`**. Catalog, Storage, RLS: **`docs/catalog-storage-and-staff.md`**. Login behavior: **`docs/admin-auth-and-login.md`**.
 
 ## Scripts
 

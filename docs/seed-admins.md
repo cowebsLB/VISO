@@ -2,22 +2,30 @@
 
 The `admins` table links Supabase Auth users to staff UI access. Passwords must **never** be committed to the repo.
 
-## How login works (usernames only)
+## How login works (username or full email)
 
-Staff use **internal usernames** (e.g. `christian`, `rita`) and a password on `/admin/login`.  
-Supabase Auth’s email/password provider still stores an **email-shaped** value in `auth.users.email`. You set that once in the Dashboard as **`username@viso-admin.local`** — staff never type or see that string in normal use; the app maps `christian` → `christian@viso-admin.local` when signing in.
+On **`/admin/login`**, the first field is **“Email or username”**.
+
+1. **Synthetic staff accounts (recommended for simple setups):**  
+   In the Dashboard, create users with email **`something@viso-admin.local`**. On the site, staff type only **`something`** (no `@`); the app signs in as **`something@viso-admin.local`**.
+
+2. **Real email addresses (e.g. Gmail):**  
+   If you create the user with **`person@gmail.com`** in **Authentication → Users**, staff must type that **full address** in the login field (the app detects `@` and does not rewrite the domain).
+
+Passwords are never stored in the repo. See **[admin-auth-and-login.md](./admin-auth-and-login.md)** for redirects, sign-out behavior, and edge cases.
 
 ## 1. Create Auth users (Dashboard)
 
 1. **Authentication** → **Users** → **Add user** → **Create new user**.
 2. For each person, set:
-   - **Email** (required by Supabase — use this exact pattern):  
-     `christian@viso-admin.local`, `rita@viso-admin.local`, `vicky@viso-admin.local`, `sonig@viso-admin.local`
+   - **Email** (required by Supabase). Either:
+     - **`username@viso-admin.local`** (e.g. `christian@viso-admin.local`, …) so they can sign in with the short **username** on the site, **or**
+     - A **real address** (e.g. Gmail); they must sign in with that **full email** on the site.
    - **Password** (set securely; not in git).
    - **Auto Confirm User** so they can sign in immediately.
 3. Enable **Email** provider under **Authentication** → **Providers** (no Google/OAuth needed for staff in v1).
 
-Staff will sign in with only the **first part** (e.g. `christian`), not the full `@viso-admin.local` string.
+For **`@viso-admin.local`** accounts only, staff can sign in with the **first part** (e.g. `christian`) instead of the full email.
 
 ## 2. Insert `admins` rows
 
