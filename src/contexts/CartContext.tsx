@@ -2,6 +2,7 @@
 
 import {
   CART_STORAGE_KEY,
+  CART_STORAGE_LEGACY_KEY,
   type CartLine,
   type CartState,
   cartItemCount,
@@ -32,7 +33,19 @@ const CartContext = createContext<CartContextValue | null>(null);
 function readCart(): CartState {
   if (typeof window === "undefined") return emptyCart();
   try {
-    return parseCart(localStorage.getItem(CART_STORAGE_KEY));
+    let raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (raw == null) {
+      raw = localStorage.getItem(CART_STORAGE_LEGACY_KEY);
+      if (raw != null) {
+        try {
+          localStorage.setItem(CART_STORAGE_KEY, raw);
+          localStorage.removeItem(CART_STORAGE_LEGACY_KEY);
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+    return parseCart(raw);
   } catch {
     return emptyCart();
   }

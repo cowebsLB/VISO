@@ -2,6 +2,9 @@
  * Staff logins are **usernames** in the UI. Supabase Auth (email provider) still needs an
  * email-shaped `auth.users.email`, so we map `christian` → `christian@viso-admin.local`
  * only for the API call — staff never use email addresses day to day.
+ *
+ * The `viso-admin.local` domain is a legacy synthetic host kept so existing Auth users
+ * continue to match; do not change without migrating `auth.users.email` in Supabase.
  */
 export const STAFF_EMAIL_DOMAIN = "viso-admin.local";
 

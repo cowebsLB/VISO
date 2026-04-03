@@ -8,6 +8,8 @@ import {
 import type { Metadata, Viewport } from "next";
 import { BRAND_DESCRIPTION, BRAND_NAME, BRAND_SITE_NAME } from "@/lib/brand";
 import { publicAsset, siteUrl } from "@/lib/basePath";
+
+const manifestHref = publicAsset("/manifest.webmanifest");
 import "./globals.css";
 
 const display = Fraunces({
@@ -41,6 +43,7 @@ const canonicalBase = siteUrl.replace(/\/$/, "");
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${canonicalBase}/`),
+  manifest: manifestHref,
   title: {
     default: `${BRAND_NAME} — Home bakery`,
     template: `%s — ${BRAND_NAME}`,
@@ -109,7 +112,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${display.variable} ${sans.variable} ${sansArabic.variable} ${sansArmenian.variable} min-h-screen bg-surface font-sans text-slate-800 antialiased`}
+        className={`${display.variable} ${sans.variable} ${sansArabic.variable} ${sansArmenian.variable} min-h-screen overflow-x-hidden bg-surface font-sans text-slate-800 antialiased`}
       >
         <ClientProviders>{children}</ClientProviders>
       </body>

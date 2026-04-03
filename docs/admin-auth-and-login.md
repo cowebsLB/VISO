@@ -36,6 +36,10 @@ Staff routes under **`/admin`** use Supabase Auth (email/password) with RLS poli
 
 - **`src/app/admin/layout.tsx`** wraps all admin routes with **`AdminAuthGate`**.
 
+## Order notifications (admin)
+
+In **production** (service worker enabled), staff can turn on **order notifications** from the bar below the admin nav. The page asks for **Notification** permission, then **polls** for new rows in **`orders`** every 45 seconds (only while the tab is open). The **same Serwist service worker** (`src/app/sw.ts`) shows the notification via a **`message`** handler; **`notificationclick`** focuses an open `/admin` tab or opens **Orders**. In **`next dev`**, Serwist is disabled (`ClientProviders`), so a short notice is shown instead—use **`npm run build`** + **`npm run start`** to test notifications locally.
+
 ## Related
 
 - [seed-admins.md](./seed-admins.md) — creating users and `admins` rows.

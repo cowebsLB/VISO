@@ -2,6 +2,7 @@
 
 import {
   LOCALE_STORAGE_KEY,
+  LOCALE_STORAGE_LEGACY_KEY,
   type LocaleCode,
   isLocale,
   localeFromNavigator,
@@ -28,7 +29,18 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 function readStoredLocale(): LocaleCode | null {
   if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(LOCALE_STORAGE_KEY);
+    let raw = localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (raw == null) {
+      raw = localStorage.getItem(LOCALE_STORAGE_LEGACY_KEY);
+      if (raw != null && isLocale(raw)) {
+        try {
+          localStorage.setItem(LOCALE_STORAGE_KEY, raw);
+          localStorage.removeItem(LOCALE_STORAGE_LEGACY_KEY);
+        } catch {
+          /* ignore */
+        }
+      }
+    }
     return raw && isLocale(raw) ? raw : null;
   } catch {
     return null;

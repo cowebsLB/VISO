@@ -1,4 +1,4 @@
--- VISO bakery: core enums, tables, indexes (PostgreSQL 15+)
+-- Anush Badar bakery: core enums, tables, indexes (PostgreSQL 15+)
 
 -- ---------------------------------------------------------------------------
 -- Enums

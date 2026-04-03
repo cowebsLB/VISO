@@ -1,4 +1,6 @@
-export const CART_STORAGE_KEY = "viso-cart";
+/** Current key; legacy `viso-cart` is migrated on read in CartProvider. */
+export const CART_STORAGE_KEY = "anushbadar-cart";
+export const CART_STORAGE_LEGACY_KEY = "viso-cart";
 export const CART_VERSION = 2 as const;
 
 export type CartLine = {

@@ -56,10 +56,10 @@ export function Header() {
       >
         {m.skip}
       </a>
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-w-0 max-w-6xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="flex shrink-0 items-center gap-3 transition hover:opacity-90"
+          className="flex min-w-0 shrink items-center gap-3 transition hover:opacity-90"
         >
           <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-2xl ring-2 ring-primary/20">
             <Image
@@ -71,7 +71,7 @@ export function Header() {
               priority
             />
           </span>
-          <span className="font-display text-xl font-bold text-primary-600">
+          <span className="min-w-0 truncate font-display text-xl font-bold text-primary-600">
             {brand.name}
           </span>
         </Link>

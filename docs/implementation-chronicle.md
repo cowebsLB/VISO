@@ -398,6 +398,15 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **New:** **`admin-auth-and-login.md`**, **`admin-inventory.md`**, **`admin-recipes-bom.md`**, **`dev-environment-windows.md`**, **`Worklog-02-04-2026.md`**.
 - **Updated:** **`seed-admins.md`** (Gmail / full-email login); **`catalog-storage-and-staff.md`** (pointer to index); this chronicle (**Part I**, file map, error table).
 
+## Part J — Branding, PWA, admin UX (3 Apr 2026)
+
+### J.1 Branding, PWA, and dev stability
+
+- **Branding:** User-facing **VISO** → **Anush Badar** where appropriate; **`anushbadar-bakery`** package name; legacy **`viso-*`** localStorage keys migrated to **`anushbadar-*`**; **`viso-admin.local`** documented as legacy synthetic email domain for Supabase.
+- **PWA:** **`manifest`** `id` / `scope` / categories; root **`metadata.manifest`**; **`PwaInstallBanner`** for install hints; **`globals.css`** **`site-*`** keyframes; **`SITE_SHOW_NOTIFICATION`** SW message type; **`postShowNotificationViaSw`** admin-path-only guard.
+- **Dev `/_next/static` 404:** **Cache Storage** cleared on **`localhost`** dev load together with service worker unregister; README troubleshooting updated.
+- **Admin orders:** Card list below **`xl`**, table **`xl`+**, mirroring **Menu** admin layout.
+
 ---
 
 ## Revision
@@ -405,5 +414,6 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **v1:** Supabase-focused chronicle.
 - **v2:** Full multi-phase chat narrative + merged technical detail.
 - **v3:** Part I (2 Apr 2026 admin + docs); split reference docs under **`docs/`** with **`docs/index.md`**.
+- **v4:** Part J (3 Apr 2026 branding, PWA, dev cache, orders cards).
 
 *Compiled from session transcript and repo state — April 2026.*

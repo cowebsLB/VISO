@@ -14,11 +14,11 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-b from-surface to-primary-50/30 px-4 py-16 sm:px-6 md:py-24 lg:px-8">
-        <div className="animate-float-soft pointer-events-none absolute -right-20 top-10 h-64 w-64 rounded-full bg-primary-200/30 blur-3xl" />
-        <div className="relative mx-auto max-w-6xl">
-          <div className="grid items-center gap-10 md:grid-cols-2">
-            <div className="animate-fade-up space-y-6">
+      <section className="relative overflow-x-clip overflow-y-hidden bg-gradient-to-b from-surface to-primary-50/30 px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+        <div className="animate-float-soft pointer-events-none absolute -right-20 top-10 h-64 w-64 max-w-[100vw] rounded-full bg-primary-200/30 blur-3xl sm:-right-16 md:-right-20" />
+        <div className="relative mx-auto w-full min-w-0 max-w-6xl">
+          <div className="grid w-full min-w-0 grid-cols-1 items-center gap-10 md:grid-cols-2">
+            <div className="animate-fade-up min-w-0 space-y-6">
               <h1 className="font-display text-4xl font-bold leading-tight text-primary-600 md:text-5xl">
                 {h.heroTitle}
               </h1>
@@ -38,7 +38,7 @@ export default function HomePage() {
                 </Link>
               </div>
             </div>
-            <div className="animate-fade-in relative mx-auto aspect-square w-full max-w-sm">
+            <div className="animate-fade-in relative mx-auto aspect-square w-full min-w-0 max-w-sm md:mx-0 md:justify-self-end">
               <div className="absolute inset-0 rounded-3xl bg-white shadow-card ring-1 ring-primary/10" />
               <div className="relative h-full w-full p-6">
                 <Image
@@ -55,15 +55,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-2 md:items-center">
-          <div className="animate-fade-up">
+      <section className="mx-auto w-full min-w-0 max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid min-w-0 grid-cols-1 gap-10 md:grid-cols-2 md:items-center">
+          <div className="animate-fade-up min-w-0">
             <h2 className="font-display text-3xl font-bold text-primary-600">
               {h.aboutTitle}
             </h2>
             <p className="mt-4 text-slate-700 leading-relaxed">{h.aboutBody}</p>
           </div>
-          <div className="animate-fade-up rounded-3xl bg-white p-8 shadow-card ring-1 ring-primary/10 delay-100">
+          <div className="animate-fade-up min-w-0 rounded-3xl bg-white p-8 shadow-card ring-1 ring-primary/10 delay-100">
             <p className="text-sm font-medium uppercase tracking-wide text-primary-500">
               {brand.name}
             </p>
@@ -73,15 +73,15 @@ export default function HomePage() {
       </section>
 
       <section className="bg-white/50 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto w-full min-w-0 max-w-6xl">
           <h2 className="font-display text-center text-3xl font-bold text-primary-600">
             {h.featuredTitle}
           </h2>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((p, i) => (
               <article
                 key={p.id}
-                className="animate-fade-up group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-primary/10 transition hover:-translate-y-1 hover:shadow-lg"
+                className="animate-fade-up group flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-primary/10 transition hover:-translate-y-1 hover:shadow-lg"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div className="relative aspect-[4/3] bg-surface">
@@ -114,8 +114,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-        <ul className="grid gap-6 md:grid-cols-3">
+      <section className="mx-auto w-full min-w-0 max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+        <ul className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-3">
           <li className="flex flex-col items-center rounded-2xl bg-primary-50/80 p-6 text-center ring-1 ring-primary/15">
             <span className="text-3xl" aria-hidden>
               🥖

@@ -24,15 +24,15 @@
 
 @layer utilities {
   .animate-fade-up {
-    animation: viso-fade-up 0.6s ease-out both;
+    animation: site-fade-up 0.6s ease-out both;
   }
 
   .animate-fade-in {
-    animation: viso-fade-in 0.5s ease-out both;
+    animation: site-fade-in 0.5s ease-out both;
   }
 
   .animate-float-soft {
-    animation: viso-float 5s ease-in-out infinite;
+    animation: site-float 5s ease-in-out infinite;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -44,7 +44,7 @@
   }
 }
 
-@keyframes viso-fade-up {
+@keyframes site-fade-up {
   from {
     opacity: 0;
     transform: translateY(16px);
@@ -55,7 +55,7 @@
   }
 }
 
-@keyframes viso-fade-in {
+@keyframes site-fade-in {
   from {
     opacity: 0;
   }
@@ -64,7 +64,7 @@
   }
 }
 
-@keyframes viso-float {
+@keyframes site-float {
   0%,
   100% {
     transform: translateY(0);

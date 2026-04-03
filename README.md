@@ -52,8 +52,9 @@ If **`Cannot find module './331.js'`** / **`./124.js`** or chunk 404s persist af
 ### If **`layout.css` / `main-app.js` / `_next/static/chunks/...` 404** on **3040**
 
 1. **Stop** the dev server → **`npm run clean`** → start dev again → **hard refresh** (Ctrl+Shift+R) or DevTools **Disable cache**.
-2. **Service worker:** after a production `npm run build`, Chrome may still have **`sw.js`** controlling `localhost` (stale precache → **`bad-precaching-response`** / `_ssgManifest.js` **404**). **`npm run dev`** unregisters workers on **localhost** on load; if errors persist, DevTools → **Application** → **Service workers** → **Unregister**, then hard reload.
-3. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`).
+2. **Service worker + Cache storage:** after visiting a **static export** preview (`serve out`) or **production**, Serwist can leave **`sw.js`** and **Cache storage** entries that intercept **`/_next/static/*`** on **`localhost`** (stale precache → chunk **404**, especially on **`/admin/...`**). On each **`npm run dev`** load, the app **unregisters service workers** and **deletes all Cache Storage** for `localhost` / `127.0.0.1`. If errors persist, DevTools → **Application** → **Service workers** → **Unregister**, then **Cache storage** → delete site entries → hard reload (you may need **two** reloads so the first pass clears caches).
+3. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`); otherwise **`/_next/static/...` 404** is common.
+4. Messages like **`content.js`** / “Feature is disabled” usually come from a **browser extension**, not this repo.
 
 ### If you see `500` on `http://localhost:3000`
 

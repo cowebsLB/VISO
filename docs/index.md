@@ -1,6 +1,6 @@
-# VISO documentation
+# Anush Badar — documentation
 
-Technical reference for the **Anush Badar / VISO** bakery site: Next.js storefront, Supabase backend, staff admin, and local development.
+Technical reference for the **Anush Badar** bakery site: Next.js storefront, Supabase backend, staff admin, and local development.
 
 ## Start here
 
@@ -14,7 +14,7 @@ Technical reference for the **Anush Badar / VISO** bakery site: Next.js storefro
 
 | Doc | What it covers |
 |-----|----------------|
-| [admin-auth-and-login.md](./admin-auth-and-login.md) | `/admin/login`, username vs Gmail, redirects, sign-out, `AdminAuthGate` |
+| [admin-auth-and-login.md](./admin-auth-and-login.md) | `/admin/login`, username vs Gmail, redirects, sign-out, `AdminAuthGate`, optional order notifications (SW) |
 | [admin-inventory.md](./admin-inventory.md) | Ingredients list, add/edit/update stock/remove, `adjust_inventory` RPC |
 | [admin-recipes-bom.md](./admin-recipes-bom.md) | Bill of materials UI, grouping, add/edit/remove lines, variant vs fallback rules |
 
@@ -30,6 +30,7 @@ Technical reference for the **Anush Badar / VISO** bakery site: Next.js storefro
 |-----|----------------|
 | [implementation-chronicle.md](./implementation-chronicle.md) | Long-form timeline of major phases, errors, and fixes |
 | [Worklog-02-04-2026.md](./Worklog-02-04-2026.md) | Daily worklog: admin inventory, auth, recipes, docs restructure (2 Apr 2026) |
+| [Worklog-03-04-2026.md](./Worklog-03-04-2026.md) | Daily worklog: Anush Badar branding, PWA/dev cache, staff notifs, orders cards (3 Apr 2026) |
 
 ## Database and migrations
 

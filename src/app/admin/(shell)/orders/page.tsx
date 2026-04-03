@@ -391,63 +391,113 @@ export default function AdminOrdersPage() {
             Refresh
           </button>
         </div>
-        <div className="mt-4 overflow-x-auto rounded-xl bg-white ring-1 ring-slate-200">
-          <table className="min-w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600">
-              <tr>
-                <th className="px-3 py-2">When</th>
-                <th className="px-3 py-2">Status</th>
-                <th className="px-3 py-2">Source</th>
-                <th className="px-3 py-2">Customer</th>
-                <th className="px-3 py-2">Total</th>
-                <th className="px-3 py-2" />
-              </tr>
-            </thead>
-            <tbody>
-              {loading && (
-                <tr>
-                  <td colSpan={6} className="px-3 py-6 text-slate-500">
-                    Loading…
-                  </td>
-                </tr>
-              )}
-              {!loading &&
-                orders.length === 0 &&
-                !error && (
-                  <tr>
-                    <td colSpan={6} className="px-3 py-6 text-slate-500">
-                      No orders yet. Web checkout orders appear here after customers complete checkout.
-                    </td>
-                  </tr>
-                )}
-              {!loading &&
-                orders.map((o) => (
-                  <tr key={o.id} className="border-t border-slate-100">
-                    <td className="px-3 py-2 whitespace-nowrap text-slate-700">
-                      {new Date(o.created_at).toLocaleString()}
-                    </td>
-                    <td className="px-3 py-2 font-medium">{o.status}</td>
-                    <td className="px-3 py-2">{o.source}</td>
-                    <td className="px-3 py-2">
-                      {o.customer_name}
-                      <br />
-                      <span className="text-slate-500">{o.phone}</span>
-                    </td>
-                    <td className="px-3 py-2">${Number(o.subtotal).toFixed(2)}</td>
-                    <td className="px-3 py-2">
+
+        {loading && (
+          <p className="mt-4 rounded-xl border border-slate-200 bg-white py-8 text-center text-slate-500 shadow-sm">
+            Loading…
+          </p>
+        )}
+
+        {!loading && orders.length === 0 && !error && (
+          <div className="mt-4 rounded-xl border border-slate-200 bg-white py-12 text-center text-slate-500 shadow-sm">
+            No orders yet. Web checkout orders appear here after customers complete checkout.
+          </div>
+        )}
+
+        {!loading && orders.length > 0 && (
+          <>
+            <ul className="mt-4 space-y-3 xl:hidden" aria-label="Orders">
+              {orders.map((o) => (
+                <li
+                  key={o.id}
+                  className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm ring-1 ring-slate-100"
+                >
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="font-semibold text-slate-900">{o.customer_name}</p>
+                      <p className="text-sm text-slate-600">{o.phone}</p>
+                      <p className="text-xs text-slate-500">
+                        {new Date(o.created_at).toLocaleString()}
+                      </p>
+                      <p className="pt-1 text-sm text-slate-700">
+                        <span className="font-medium capitalize">{o.status.replaceAll("_", " ")}</span>
+                        <span className="text-slate-300"> · </span>
+                        <span className="text-slate-600">{o.source}</span>
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 flex-col items-stretch gap-2 sm:items-end">
+                      <p className="text-lg font-semibold text-slate-900">
+                        ${Number(o.subtotal).toFixed(2)}
+                      </p>
                       <button
                         type="button"
-                        className="text-primary-600 underline"
+                        className="inline-flex items-center justify-center rounded-full border-2 border-primary-600 bg-white px-4 py-1.5 text-sm font-semibold text-primary-700 shadow-sm transition hover:bg-primary-50"
                         onClick={() => setSelectedId(o.id === selectedId ? null : o.id)}
                       >
                         {selectedId === o.id ? "Close" : "Details"}
                       </button>
-                    </td>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-4 hidden overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm xl:block">
+              <table className="min-w-full text-left text-sm">
+                <thead className="border-b border-slate-200 bg-slate-50 text-slate-600">
+                  <tr>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      When
+                    </th>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      Status
+                    </th>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      Source
+                    </th>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      Customer
+                    </th>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      Total
+                    </th>
+                    <th className="px-3 py-3 font-semibold" scope="col">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {orders.map((o) => (
+                    <tr key={o.id} className="border-b border-slate-100 last:border-0">
+                      <td className="whitespace-nowrap px-3 py-2 text-slate-700">
+                        {new Date(o.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2 font-medium capitalize">
+                        {o.status.replaceAll("_", " ")}
+                      </td>
+                      <td className="px-3 py-2">{o.source}</td>
+                      <td className="px-3 py-2">
+                        {o.customer_name}
+                        <br />
+                        <span className="text-slate-500">{o.phone}</span>
+                      </td>
+                      <td className="px-3 py-2">${Number(o.subtotal).toFixed(2)}</td>
+                      <td className="px-3 py-2">
+                        <button
+                          type="button"
+                          className="font-semibold text-primary-700 underline"
+                          onClick={() => setSelectedId(o.id === selectedId ? null : o.id)}
+                        >
+                          {selectedId === o.id ? "Close" : "Details"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
 
       {selected && (
