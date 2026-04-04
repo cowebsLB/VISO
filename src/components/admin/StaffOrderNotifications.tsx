@@ -63,7 +63,6 @@ export function StaffOrderNotifications() {
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") return;
     if (!("serviceWorker" in navigator)) return;
     void navigator.serviceWorker.ready.then(() => setSwReady(true));
   }, []);
@@ -156,7 +155,8 @@ export function StaffOrderNotifications() {
     const ok = await postShowNotificationViaSw({
       title,
       body,
-      tag: `anushbadar-order-${latest.id}`,
+      /** Same tag as `send-order-push` so poll + push replace one notification instead of duplicating. */
+      tag: `order-${latest.id}`,
       icon,
       data: ordersUrl ? { url: ordersUrl } : undefined,
     });
@@ -171,13 +171,13 @@ export function StaffOrderNotifications() {
   }, []);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") return;
     if (!enabled || permission !== "granted" || !swReady) return;
-    if (pushRegistered && getVapidPublicKey()) return;
+    // Always poll while this tab is open. Push handles the background; polling covers webhook/push
+    // failures and matches the doc line that VAPID adds push on top of in-tab checks.
     void checkNewOrders();
     const id = window.setInterval(() => void checkNewOrders(), POLL_MS);
     return () => window.clearInterval(id);
-  }, [enabled, permission, swReady, pushRegistered, checkNewOrders]);
+  }, [enabled, permission, swReady, checkNewOrders]);
 
   async function enableNotifications() {
     if (permission === "unsupported") return;

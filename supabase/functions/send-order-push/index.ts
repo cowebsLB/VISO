@@ -20,6 +20,8 @@ type WebhookBody = {
   table?: string;
   schema?: string;
   record?: OrderRow;
+  /** Some webhook / proxy shapes nest the payload */
+  payload?: { record?: OrderRow; type?: string; table?: string; schema?: string };
 };
 
 const corsHeaders = {
@@ -81,9 +83,9 @@ Deno.serve(async (req) => {
 
   webpush.setVapidDetails(vapidSubject, vapidPublic, vapidPrivate);
 
-  let body: WebhookBody;
+  let raw: unknown;
   try {
-    body = (await req.json()) as WebhookBody;
+    raw = await req.json();
   } catch {
     return new Response(JSON.stringify({ error: "Invalid JSON" }), {
       status: 400,
@@ -91,15 +93,38 @@ Deno.serve(async (req) => {
     });
   }
 
-  const evtType = body.type ?? body.eventType;
-  if (evtType !== "INSERT" || body.table !== "orders" || body.schema !== "public" || !body.record) {
-    return new Response(JSON.stringify({ ok: true, skipped: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+  const body = raw as WebhookBody;
+  const nested = body.payload && typeof body.payload === "object" ? body.payload : undefined;
+  const record = body.record ?? nested?.record;
+  const tableRaw = body.table ?? nested?.table;
+  const schemaRaw = body.schema ?? nested?.schema ?? "public";
+  const typeRaw = body.type ?? body.eventType ?? nested?.type;
+
+  const evtType = String(typeRaw ?? "").trim().toUpperCase();
+  const table = String(tableRaw ?? "").toLowerCase();
+  const schema = String(schemaRaw ?? "public").trim().toLowerCase();
+
+  /** Require INSERT when `type` is present; if omitted, assume insert-only webhook. */
+  const isInsert = typeRaw == null || typeRaw === "" || evtType === "INSERT";
+  const isOrders = table === "orders";
+  const isPublic = schema === "public" || schema === "";
+
+  if (!isInsert || !isOrders || !isPublic || !record || typeof record !== "object") {
+    const keys = raw && typeof raw === "object" ? Object.keys(raw as object) : [];
+    console.warn("send-order-push: skipped — payload mismatch", { evtType, table, schema, hasRecord: !!record, keys });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        skipped: true,
+        reason: "payload_mismatch",
+        hint: "Expected INSERT on public.orders with record; check Integration webhook JSON shape.",
+        saw: { type: typeRaw, table: tableRaw, schema: schemaRaw, topLevelKeys: keys },
+      }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 
-  const order = body.record;
+  const order = record as OrderRow;
   const ordersPath = "/admin/orders";
   const notificationUrl = siteUrl ? `${siteUrl}${ordersPath}` : "";
 
@@ -123,6 +148,13 @@ Deno.serve(async (req) => {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  const total = (subs ?? []).length;
+  if (total === 0) {
+    console.warn(
+      "send-order-push: no rows in admin_push_subscriptions — open deployed /admin, turn notifications on (same Supabase project), NEXT_PUBLIC_VAPID_PUBLIC_KEY must be in the build",
+    );
   }
 
   let sent = 0;
@@ -152,7 +184,7 @@ Deno.serve(async (req) => {
     }
   }
 
-  return new Response(JSON.stringify({ ok: true, sent, failed, total: (subs ?? []).length }), {
+  return new Response(JSON.stringify({ ok: true, sent, failed, total }), {
     status: 200,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });

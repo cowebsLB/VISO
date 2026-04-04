@@ -69,7 +69,6 @@ function StorefrontSerwist({ children }: { children: ReactNode }) {
 
 function useRegisterAdminServiceWorker(isAdminRoute: boolean) {
   useEffect(() => {
-    if (process.env.NODE_ENV === "development") return;
     if (!isAdminRoute || typeof navigator === "undefined" || !("serviceWorker" in navigator)) {
       return;
     }
