@@ -1,7 +1,4 @@
 import Link from "next/link";
-import { basePath } from "@/lib/basePath";
-
-const homeHref = basePath ? `${basePath}/` : "/";
 
 export default function NotFound() {
   return (
@@ -9,7 +6,7 @@ export default function NotFound() {
       <h1 className="font-display text-4xl font-bold text-primary-600">404</h1>
       <p className="mt-2 text-slate-600">This page could not be found.</p>
       <Link
-        href={homeHref}
+        href="/"
         className="mt-8 rounded-full bg-primary-500 px-8 py-3 font-semibold text-white shadow-soft"
       >
         Back home

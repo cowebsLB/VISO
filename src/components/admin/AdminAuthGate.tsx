@@ -7,11 +7,17 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
+function isAdminLoginPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  const p = pathname.replace(/\/+$/, "") || "/";
+  return p === "/admin/login";
+}
+
 export function AdminAuthGate({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [ready, setReady] = useState(false);
-  const isLogin = pathname?.endsWith("/admin/login") ?? false;
+  const isLogin = isAdminLoginPath(pathname ?? null);
 
   useEffect(() => {
     if (!hasSupabaseEnv()) {
@@ -51,7 +57,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [isLogin, router]);
+  }, [isLogin, pathname, router]);
 
   if (!hasSupabaseEnv() && !isLogin) {
     return (

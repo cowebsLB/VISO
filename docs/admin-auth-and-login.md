@@ -36,6 +36,11 @@ Staff routes under **`/admin`** use Supabase Auth (email/password) with RLS poli
 
 - **`src/app/admin/layout.tsx`** wraps all admin routes with **`AdminAuthGate`**.
 
+## GitHub Pages (`/VISO`) — avoid “kicked out” to the wrong site
+
+- **Next.js `Link`:** Always use **root-relative paths without the base path** (e.g. **`href="/"`**, **`href="/admin/login"`**). **`next.config`** **`basePath`** is applied automatically. Hand-building **`href={"/VISO/"}`** **doubles** the prefix → **`/VISO/VISO/…`** → **404** and confusion. **`not-found.tsx`** “Back home” uses **`href="/"`** only.
+- **Supabase Dashboard → Authentication → URL configuration:** Set **Site URL** to your real app root, e.g. **`https://cowebslb.github.io/VISO`** (with the project path). If it is **`https://cowebslb.github.io`** only, **password reset / magic links** can send users to the **user** Pages site instead of the bakery app.
+
 ## Order notifications (admin)
 
 In **production** (service worker enabled), staff can turn on **order notifications** from the bar below the admin nav. The page asks for **Notification** permission. If **`NEXT_PUBLIC_VAPID_PUBLIC_KEY`** is set and Supabase push is configured, the device **registers Web Push** and **background** alerts are sent via an Edge Function when **`orders`** rows are inserted; otherwise the app **polls** **`orders`** every 45 seconds **only while the tab is open**. On **`/admin`** routes the **admin** worker (`public/admin/sw.js`, nested scope `…/admin/`) handles **`push`** events and **`SITE_SHOW_NOTIFICATION`** messages; the storefront uses Serwist (`src/app/sw.ts`). **`notificationclick`** focuses an open `/admin` tab or opens **Orders**. In **`next dev`**, service workers are disabled (`ClientProviders`), so a short notice is shown instead—use **`npm run build`** + **`npm run start`** to test notifications locally.

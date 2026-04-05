@@ -96,7 +96,7 @@ taskkill /PID <pid> /F
 ## Deploy
 
 - **Vercel / Node host:** connect the repo and set `NEXT_PUBLIC_WHATSAPP_ORDER_NUMBER`.
-- **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Add **repository secrets**: `WHATSAPP_ORDER_NUMBER` (digits only), `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (for catalog static paths and client-side checkout/admin).
+- **GitHub Pages (this repo):** the workflow `.github/workflows/deploy-pages.yml` builds a static export with `NEXT_PUBLIC_BASE_PATH=/VISO` and `NEXT_PUBLIC_SITE_URL=https://cowebslb.github.io/VISO`, uploads the `out/` folder, and deploys via GitHub Actions. In the repo **Settings → Pages**, set **Source** to **GitHub Actions** (not “Deploy from a branch,” which only shows the README). Add **repository secrets**: `WHATSAPP_ORDER_NUMBER` (digits only), `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (for catalog static paths and client-side checkout/admin). In **Supabase → Authentication → URL configuration**, set **Site URL** to **`https://cowebslb.github.io/VISO`** so auth redirects and emails stay under the app (see **`docs/admin-auth-and-login.md`**).
 
 ## Documentation
 
