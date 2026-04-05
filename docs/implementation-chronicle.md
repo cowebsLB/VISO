@@ -459,6 +459,12 @@ This document reconstructs work from **the full Cursor conversation** that built
 
 - **Staff UI:** Polling runs alongside Web Push when notifications are on; shared notification **`tag`** **`order-<id>`** with Edge Function payload (see **Worklog-04-04-2026**).
 
+### L.6 GitHub Pages **`/admin/`** 404 (static export file layout)
+
+- **Symptom:** Installed **Staff** PWA or navigation to **`https://…/VISO/admin/`** showed the app’s **`not-found.tsx`** (not GitHub’s generic 404).
+- **Cause:** Default **`next export`**-style output used **`out/admin.html`**. **`start_url: "./"`** on **`public/admin/manifest.webmanifest`** resolves to a **trailing-slash** URL; static hosts treat that as **`admin/index.html`**, which did not exist.
+- **Fix:** **`trailingSlash: true`** in **`next.config.ts`** when **`output: "export"`** is active, producing **`out/admin/index.html`** (and **`out/admin/login/index.html`**, etc.). **`.github/workflows/deploy-pages.yml`** already deploys the full **`out/`** artifact — no workflow change.
+
 ---
 
 ## Revision
@@ -469,5 +475,6 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **v4:** Part J (3 Apr 2026 branding, PWA, dev cache, orders cards).
 - **v5:** Part K (admin Web Push + Supabase automation + dashboard path).
 - **v6:** Part L (5 Apr 2026 split PWA manifests, preview script, dev webpack / `.next` hygiene).
+- **v7:** Part **L.6** (same day): static export **`trailingSlash`** for **`admin/index.html`** on GitHub Pages / staff PWA **`start_url`**.
 
 *Compiled from session transcript and repo state — April 2026.*

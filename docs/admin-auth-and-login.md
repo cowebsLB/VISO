@@ -39,6 +39,7 @@ Staff routes under **`/admin`** use Supabase Auth (email/password) with RLS poli
 ## GitHub Pages (`/VISO`) — avoid “kicked out” to the wrong site
 
 - **Next.js `Link`:** Always use **root-relative paths without the base path** (e.g. **`href="/"`**, **`href="/admin/login"`**). **`next.config`** **`basePath`** is applied automatically. Hand-building **`href={"/VISO/"}`** **doubles** the prefix → **`/VISO/VISO/…`** → **404** and confusion. **`not-found.tsx`** “Back home” uses **`href="/"`** only.
+- **Trailing slash vs `admin.html`:** With **`output: "export"`**, the default layout writes **`out/admin.html`**. Browsers and the staff PWA manifest (**`start_url`:** **`./`**) open **`…/admin/`** (directory URL). GitHub Pages serves that only if **`out/admin/index.html`** exists. This repo enables **`trailingSlash: true`** in **`next.config.ts`** for **build/start** (static export) so **`out/admin/index.html`** is generated. The **Deploy to GitHub Pages** workflow uploads all of **`out/`** — a **404** on **`/VISO/admin/`** was not a “partial deploy,” it was the export shape.
 - **Supabase Dashboard → Authentication → URL configuration:** Set **Site URL** to your real app root, e.g. **`https://cowebslb.github.io/VISO`** (with the project path). If it is **`https://cowebslb.github.io`** only, **password reset / magic links** can send users to the **user** Pages site instead of the bakery app.
 
 ## Order notifications (admin)

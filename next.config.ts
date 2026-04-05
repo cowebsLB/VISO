@@ -55,6 +55,9 @@ const withSerwist = withSerwistInit({
 
 const nextConfig: NextConfig = {
   ...(useStaticExport ? { output: "export" as const } : {}),
+  // GitHub Pages (and the staff PWA `start_url: "./"`) resolve `/admin/` as a directory and need
+  // `admin/index.html`. Default export uses `admin.html`, which 404s for trailing-slash URLs.
+  ...(useStaticExport ? { trailingSlash: true as const } : {}),
   outputFileTracingRoot: path.join(__dirname),
   basePath: basePath || undefined,
   assetPrefix: basePath || undefined,
