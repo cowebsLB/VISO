@@ -1,5 +1,6 @@
 "use client";
 
+import { BasePathDevRedirect } from "@/components/BasePathDevRedirect";
 import { CartProvider } from "@/contexts/CartContext";
 import { LocaleProvider } from "@/contexts/LocaleContext";
 import { basePath } from "@/lib/basePath";
@@ -84,9 +85,12 @@ export function ClientProviders({ children }: { children: ReactNode }) {
   useRegisterAdminServiceWorker(isAdminRoute);
 
   const inner = (
-    <LocaleProvider>
-      <CartProvider>{children}</CartProvider>
-    </LocaleProvider>
+    <>
+      <BasePathDevRedirect />
+      <LocaleProvider>
+        <CartProvider>{children}</CartProvider>
+      </LocaleProvider>
+    </>
   );
 
   if (process.env.NODE_ENV === "development") {

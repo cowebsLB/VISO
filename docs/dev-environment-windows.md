@@ -4,6 +4,7 @@
 
 - Default dev URL: **`http://localhost:3040`** (see `package.json` / Next config).
 - **`npm run dev`** uses **Webpack**; Serwist is off in dev by design.
+- **`NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`:** routes are under **`NEXT_PUBLIC_BASE_PATH`** (e.g. **`/VISO/admin`**). **`BasePathDevRedirect`** (`src/components/BasePathDevRedirect.tsx`) redirects **`/admin`** → **`/VISO/admin`** on localhost after load so unprefixed bookmarks still work.
 
 ## Turbopack vs Webpack
 

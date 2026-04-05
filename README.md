@@ -25,7 +25,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Use **digits only** for WhatsApp (country code + number, no `+`). Supabase **anon** key is safe in the browser (RLS applies); never put the **service role** key in `NEXT_PUBLIC_*`.
 
-**`NEXT_PUBLIC_BASE_PATH`:** fine to keep `/VISO` in `.env.local` for production parity — **`next dev` ignores it** unless you set `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`. Otherwise you would have to open `http://localhost:3040/VISO/...` and mismatched asset URLs cause **`_next/static/...` 404** on `/admin/login`.
+**`NEXT_PUBLIC_BASE_PATH`:** fine to keep `/VISO` in `.env.local` for production parity — **`next dev` ignores it** unless you set `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`. With **`FORCE` on**, every route (including **`/admin`**) lives under the prefix — e.g. **`http://localhost:3040/VISO/admin`**, not **`http://localhost:3040/admin`**. Opening the unprefixed URL 404s and may log odd RSC lines (e.g. **`VISO.txt?_rsc=`**). **`BasePathDevRedirect`** in **`ClientProviders`** auto-redirects unprefixed dev URLs to **`/VISO/...`** when **`FORCE`** is set. Without **`FORCE`**, use plain **`http://localhost:3040/admin`** (recommended for day-to-day dev).
 
 Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and anon key. **Documentation hub:** **`docs/index.md`**. Auth and `admins` rows: **`docs/seed-admins.md`**. Catalog, Storage, RLS: **`docs/catalog-storage-and-staff.md`**. Login behavior: **`docs/admin-auth-and-login.md`**. Background order push (Web Push): after `supabase link`, run **`npm run supabase:setup-order-push`** (see **`docs/supabase-step-by-step.md`**).
 
