@@ -76,7 +76,7 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **`.github/workflows/deploy-pages.yml`**: build → upload **`out/`** → **GitHub Actions** Pages deploy.
 - **`public/.nojekyll`** so `_next` and friends are not stripped by Jekyll.
 - **`src/lib/basePath.ts`** + **`publicAsset()`** so logo, images, links use **`/VISO/...`** not root-relative 404s.
-- **`src/app/manifest.ts`** (with `force-static`) replacing conflicting static manifest; correct `start_url` / icons with base path.
+- **`src/app/manifest.ts`** (with `force-static`) replacing conflicting static manifest; correct `start_url` / icons with base path. *(Later superseded Apr 2026: static **`public/manifest.webmanifest`** + no root **`app/manifest.ts`** — see **Part L**.)*
 - **`layout.tsx`**: `metadataBase`, OG URLs to **`https://cowebslb.github.io/VISO`**.
 - **`not-found.tsx`**: home link respects base path.
 - **Serwist:** removed duplicate **`swUrl`/`scope`** that doubled base path (`/VISO/VISO/sw.js`).
@@ -99,7 +99,7 @@ This document reconstructs work from **the full Cursor conversation** that built
 ### C.2 Favicon pack integration
 
 - **Ask:** android-chrome, apple-touch, favicon PNGs, `favicon.ico`, `site.webmanifest` from `assets/logo/`.
-- **Outcome:** Files under **`public/`**, **`src/app/favicon.ico`**, **`layout.tsx` metadata.icons**, **`manifest.ts`** icons; reference **`assets/logo/site.webmanifest`** kept in sync for humans; live manifest from **`manifest.ts`**.
+- **Outcome:** Files under **`public/`**, **`src/app/favicon.ico`**, **`layout.tsx` metadata.icons**, **`manifest.ts`** icons; reference **`assets/logo/site.webmanifest`** kept in sync for humans; live manifest from **`manifest.ts`**. *(Later: storefront manifest moved to **`public/manifest.webmanifest`** — **Part L**.)*
 
 ### C.3 Rebrand: Anush Badar + new `Logo.png`
 
@@ -409,20 +409,12 @@ This document reconstructs work from **the full Cursor conversation** that built
 
 ---
 
-## Revision
-
-- **v1:** Supabase-focused chronicle.
-- **v2:** Full multi-phase chat narrative + merged technical detail.
-- **v3:** Part I (2 Apr 2026 admin + docs); split reference docs under **`docs/`** with **`docs/index.md`**.
-- **v4:** Part J (3 Apr 2026 branding, PWA, dev cache, orders cards).
-- **v5:** Part K (admin Web Push + Supabase automation + dashboard path).
-
 ## Part K — Admin background push and Supabase ops (early Apr 2026)
 
 ### K.1 Requirement
 
 - **Ask:** Order notifications for admin **in the background** when the PWA is installed; earlier implementation only **polled** while the tab was open.
-- **Outcome:** **Web Push** via **Supabase Edge Function** `send-order-push` on **`orders` INSERT**; **`admin_push_subscriptions`** table + RLS; **`public/admin/sw.js`** `push` handler; client **`syncAdminPushSubscription`** / **`removeAdminPushSubscription`**; polling disabled when push is registered.
+- **Outcome:** **Web Push** via **Supabase Edge Function** `send-order-push` on **`orders` INSERT**; **`admin_push_subscriptions`** table + RLS; **`public/admin/sw.js`** `push` handler; client **`syncAdminPushSubscription`** / **`removeAdminPushSubscription`**. *(Follow-up Apr 2026: in-tab polling kept alongside push; see Part L / **Worklog-04-04-2026**.)*
 
 ### K.2 Next.js dev vs static export
 
@@ -440,5 +432,42 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **`scripts/supabase-setup-order-push.mjs`** + **`npm run supabase:setup-order-push`:** generates VAPID + webhook secret, **`supabase secrets set --env-file`**, **`db push`**, **`functions deploy send-order-push`**. **`web-push`** devDependency; **`supabase/.push-setup-secrets.env`** gitignored.
 - **Docs:** **`docs/admin-push-notifications.md`**, **`docs/supabase-step-by-step.md`**; **Database Webhooks** primary path is **Integrations → Webhooks** (not **Database** sidebar); direct URL pattern **`/integrations/webhooks/overview`**.
 - **Webhook pitfalls:** URL must end **`…/send-order-push`** (full name); **`Authorization: Bearer <ORDER_PUSH_WEBHOOK_SECRET>`** header required; secret readable from generated **`.push-setup-secrets.env`** locally (not shown again in Dashboard).
+
+## Part L — Split PWA manifests and dev `.next` hygiene (5 Apr 2026)
+
+### L.1 Staff vs storefront manifest on static export
+
+- **Symptom:** “Two PWAs” intent in code, but prerendered **`out/admin*.html`** still pointed the manifest link at the storefront **`…/manifest.webmanifest`** instead of **`…/admin/manifest.webmanifest`**.
+- **Cause:** Root **`src/app/manifest.ts`** participated in Next metadata merge such that the root manifest won during **`output: "export"`** for admin routes; nested **`app/admin/manifest.ts`** did not appear in **`out/`** as a separate route in this setup.
+- **Fix:** Delete **`src/app/manifest.ts`**; add **`public/manifest.webmanifest`** and **`public/admin/manifest.webmanifest`** with paths relative to each manifest URL (**`./`**, **`../`** for icons). **`admin/layout.tsx`** **`metadata.manifest`** → **`publicAsset("/admin/manifest.webmanifest")`**.
+
+### L.2 `metadataBase` hardening
+
+- **`metadataBaseUrl()`** in **`src/lib/basePath.ts`** wraps **`new URL`** for root **`layout.tsx`** **`metadataBase`**.
+
+### L.3 Preview static `out/` and `next start`
+
+- **`npm run preview`:** **`serve out`** on port **3040** after **`npm run build`**. **`npm run start`** (**`next start`**) is unreliable with **`output: "export"`** (e.g. **`routesManifest.dataRoutes is not iterable`**).
+
+### L.4 Dev chunk 404 / `routes-manifest.json` ENOENT
+
+- **Symptom:** **`GET /_next/static/chunks/app/admin/layout.js` 404**, **`ChunkLoadError`** after Fast Refresh; server log **`ENOENT`** opening **`.next/routes-manifest.json`**.
+- **Cause:** **`.next`** deleted or overwritten while **`next dev`** still running — e.g. **`npm run clean`** or **`npm run build`** in parallel with dev.
+- **Fix:** Stop dev → **`npm run clean`** → **`npm run dev`**. **Webpack `cache: false` in dev** was default and could worsen HMR drift; now opt-in only via **`NEXT_DISABLE_WEBPACK_CACHE=true`**.
+
+### L.5 Order notifications (continued)
+
+- **Staff UI:** Polling runs alongside Web Push when notifications are on; shared notification **`tag`** **`order-<id>`** with Edge Function payload (see **Worklog-04-04-2026**).
+
+---
+
+## Revision
+
+- **v1:** Supabase-focused chronicle.
+- **v2:** Full multi-phase chat narrative + merged technical detail.
+- **v3:** Part I (2 Apr 2026 admin + docs); split reference docs under **`docs/`** with **`docs/index.md`**.
+- **v4:** Part J (3 Apr 2026 branding, PWA, dev cache, orders cards).
+- **v5:** Part K (admin Web Push + Supabase automation + dashboard path).
+- **v6:** Part L (5 Apr 2026 split PWA manifests, preview script, dev webpack / `.next` hygiene).
 
 *Compiled from session transcript and repo state — April 2026.*

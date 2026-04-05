@@ -8,7 +8,7 @@ import {
 } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { BRAND_DESCRIPTION, BRAND_NAME, BRAND_SITE_NAME } from "@/lib/brand";
-import { publicAsset, siteUrl } from "@/lib/basePath";
+import { metadataBaseUrl, publicAsset, siteUrl } from "@/lib/basePath";
 import "./globals.css";
 
 const manifestHref = publicAsset("/manifest.webmanifest");
@@ -43,7 +43,7 @@ const sansArmenian = Noto_Sans_Armenian({
 const canonicalBase = siteUrl.replace(/\/$/, "");
 
 export const metadata: Metadata = {
-  metadataBase: new URL(`${canonicalBase}/`),
+  metadataBase: metadataBaseUrl(),
   manifest: manifestHref,
   title: {
     default: `${BRAND_NAME} — Home bakery`,

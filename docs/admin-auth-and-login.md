@@ -44,7 +44,7 @@ Step-by-step Supabase setup: [admin-push-notifications.md](./admin-push-notifica
 
 ## Admin PWA (nested scope, same deploy)
 
-- **Manifest:** `public/admin/manifest.webmanifest` (relative **`start_url`** / **`scope`**: `./` under `…/admin/`). **`src/app/admin/layout.tsx`** sets **`metadata.manifest`** and staff **`appleWebApp`** title so “Add to Home Screen” installs an app that opens **`/admin/`**.
+- **Manifest:** **`public/admin/manifest.webmanifest`** (staff PWA; **`start_url`** / **`scope`** are **`./`** relative to `…/admin/`). **`src/app/admin/layout.tsx`** sets **`metadata.manifest`** and staff **`appleWebApp`**. The storefront uses **`public/manifest.webmanifest`** only — there is **no** root **`app/manifest.ts`**, because that route made Next’s metadata merge reapply the root manifest on admin pages during **`output: "export"`**, so the staff manifest link was wrong in prerendered HTML.
 - **Service worker:** `public/admin/sw.js` — no Serwist precache (network by default); includes the same **push-style** **`message`** / **`notificationclick`** handlers as the main worker for staff notifications.
 - **Registration:** `ClientProviders` registers **Serwist** only on **non-admin** routes; on **`/admin`** it calls **`navigator.serviceWorker.register(.../admin/sw.js, { scope: …/admin/ })`**. Unmounting the storefront Serwist wrapper clears **`window.serwist`** so switching between site and admin does not leave a stale singleton.
 

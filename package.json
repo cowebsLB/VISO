@@ -11,6 +11,7 @@
     "dev:turbopack:clean": "npm run clean && npm run dev:turbopack",
     "dev:webpack:clean": "npm run clean && npm run dev:webpack",
     "build": "next build",
+    "preview": "npx --yes serve@14 out -l 3040",
     "start": "next start",
     "lint": "next lint",
     "test:e2e": "playwright test",

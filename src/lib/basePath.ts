@@ -25,6 +25,22 @@ function resolveSiteUrl(): string {
 
 export const siteUrl = resolveSiteUrl();
 
+/**
+ * Safe `metadataBase` for root `layout.tsx`. A bad `NEXT_PUBLIC_SITE_URL` should never take down every route.
+ */
+export function metadataBaseUrl(): URL {
+  const base = siteUrl.replace(/\/$/, "");
+  try {
+    const u = new URL(`${base}/`);
+    if (u.protocol !== "http:" && u.protocol !== "https:") {
+      return new URL(`${DEFAULT_SITE_URL}/`);
+    }
+    return u;
+  } catch {
+    return new URL(`${DEFAULT_SITE_URL}/`);
+  }
+}
+
 /** Prefix paths to files in `public/` when using a GitHub Pages project subpath. */
 export function publicAsset(path: string): string {
   const p = path.startsWith("/") ? path : `/${path}`;

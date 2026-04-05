@@ -23,7 +23,7 @@ Technical reference for the **Anush Badar** bakery site: Next.js storefront, Sup
 
 | Doc | What it covers |
 |-----|----------------|
-| [dev-environment-windows.md](./dev-environment-windows.md) | Webpack vs Turbopack, `.next` cache, `npm run clean`, Next devtools flag |
+| [dev-environment-windows.md](./dev-environment-windows.md) | Webpack vs Turbopack, `.next` cache, parallel dev/build, `npm run clean`, Next devtools flag |
 
 ## Project history
 
@@ -33,6 +33,7 @@ Technical reference for the **Anush Badar** bakery site: Next.js storefront, Sup
 | [Worklog-02-04-2026.md](./Worklog-02-04-2026.md) | Daily worklog: admin inventory, auth, recipes, docs restructure (2 Apr 2026) |
 | [Worklog-03-04-2026.md](./Worklog-03-04-2026.md) | Daily worklog: Anush Badar branding, PWA/dev cache, staff notifs, orders cards (3 Apr 2026) |
 | [Worklog-04-04-2026.md](./Worklog-04-04-2026.md) | Web Push + Supabase setup script, docs, dev/export and `siteUrl` fixes (4 Apr 2026) |
+| [Worklog-05-04-2026.md](./Worklog-05-04-2026.md) | Split PWA manifests (static JSON), `metadataBaseUrl`, `npm run preview`, dev webpack cache + `.next` corruption notes (5 Apr 2026) |
 
 ## Database and migrations
 

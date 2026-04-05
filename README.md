@@ -36,14 +36,17 @@ Staff admin (`/admin`) and build-time catalog paths need the Supabase URL and an
 | `npm run dev` | Dev server at **http://localhost:3040** (**Webpack**; Serwist off in dev). Recommended on **Windows** (paths with spaces, Defender). |
 | `npm run dev:turbopack` | Same port with **Turbopack** (faster on some setups; can error on Windows with `_buildManifest.js.tmp` ENOENT). |
 | `npm run dev:webpack` | Same as `dev` (alias). |
-| `npm run build` | Production build + `public/sw.js` |
-| `npm run start` | Run production server |
+| `npm run build` | Production static export + Serwist → `public/sw.js` |
+| `npm run preview` | After **build**: serve **`out/`** on **http://localhost:3040** (`serve`). Use this to preview the GitHub Pages bundle — **`npm run start`** is not supported with **`output: "export"`** (can throw `routesManifest` errors). |
+| `npm run start` | **`next start`** — only if you disable static export; not used for this repo’s Pages flow. |
 | `npm run lint` | ESLint |
 | `npm run test:e2e` | Playwright E2E (starts dev server locally unless `CI=1`; run `npx playwright install` once) |
 
 ### If you see `500` on `/admin/...`, `/favicon.ico`, or `/manifest.webmanifest` on **3040**
 
 Usually a **broken `.next` cache** (missing `routes-manifest.json`, **`Cannot find module './331.js'`**, **`./124.js`**, or similar chunk errors in the terminal). **`npm run clean`** also removes **`node_modules/.cache`**. **Stop** the dev server (Ctrl+C), then run **`npm run clean`** (or delete **`.next`** manually), then start again with **`npm run dev`** or **`npm run dev:webpack`**. One-shot: **`npm run dev:clean`** or **`npm run dev:webpack:clean`**. Wait until the terminal says **Ready** before opening the browser. On Windows, **never** delete `.next` while the dev server is still running (locks + half-written chunks cause this).
+
+**Do not run `npm run build` while `npm run dev` is running** in the same repo — both write **`.next`** and can delete **`routes-manifest.json` mid-session**, leading to **500**s and **chunk 404** / **`ChunkLoadError`** after Fast Refresh.
 
 If **`Cannot find module './331.js'`** / **`./124.js`** or chunk 404s persist after **`npm run clean`**, exclude the project or **`.next`** from real-time antivirus scanning, or move the repo to a path **without spaces** (e.g. `C:\dev\VISO`). If **`_buildManifest.js.tmp` ENOENT** appears with **`npm run dev:turbopack`**, use **`npm run dev`** (Webpack) instead.
 
@@ -55,7 +58,11 @@ If **`Cannot find module './331.js'`** / **`./124.js`** or chunk 404s persist af
 2. **Service worker + Cache storage:** after visiting a **static export** preview (`serve out`) or **production**, Serwist (or the **admin** worker) can leave registrations and **Cache storage** entries that intercept **`/_next/static/*`** on **`localhost`** (stale precache → chunk **404** for **`layout.css`**, **`main-app.js`**, etc.). **`LocalhostPwaCacheBustScript`** in **`layout.tsx`** runs **in `<head>` before module scripts**: it **async** unregisters workers and clears caches, then **reloads** (up to **2×** per tab) when anything was removed so the next load is not controlled by a stale worker. **`ClientProviders`** repeats cleanup on hydrate. Production hostnames are unchanged.
 3. **Still 404 after reload:** **`next build`** leaves **hashed** chunks under **`.next`** while **`next dev`** expects names like **`main-app.js`** — a mixed cache causes **real** dev-server 404s. **Stop** the dev server (**Ctrl+C**), run **`npm run clean`**, then **`npm run dev`** and wait for **Ready** before opening the browser.
 4. **Base path:** if you forced `NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV=true`, open URLs under **`http://localhost:3040/VISO/...`** (match your `NEXT_PUBLIC_BASE_PATH`); otherwise **`/_next/static/...` 404** is common.
-5. Messages like **`content.js`** / “Feature is disabled” usually come from a **browser extension**, not this repo.
+5. Messages like **`content.js`** / “Feature is disabled” or **“message channel closed”** usually come from a **browser extension**, not this repo.
+
+### Webpack dev cache (optional)
+
+By default Next **uses** webpack’s persistent cache in dev for stable Fast Refresh. To force **`cache: false`** for a one-off debug session, set **`NEXT_DISABLE_WEBPACK_CACHE=true`** (see **`.env.example`**).
 
 ### If you see `500` on `http://localhost:3000`
 
@@ -83,7 +90,7 @@ taskkill /PID <pid> /F
 
 ## PWA
 
-- Manifest: `src/app/manifest.ts` (paths respect `NEXT_PUBLIC_BASE_PATH` for GitHub Pages).
+- Manifests: **`public/manifest.webmanifest`** (storefront) and **`public/admin/manifest.webmanifest`** (staff). Paths use **`./`** / **`../`** so they resolve correctly under **`NEXT_PUBLIC_BASE_PATH`** (e.g. GitHub Pages **`/VISO`**). There is no root **`app/manifest.ts`** — it broke the staff manifest link in prerendered admin HTML during static export.
 - After `npm run build`, `public/sw.js` is generated (Serwist). It is listed in `.gitignore`; regenerate on each deploy.
 
 ## Deploy

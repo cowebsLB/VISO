@@ -68,8 +68,10 @@ const nextConfig: NextConfig = {
       return p ? [p] : [];
     })(),
   },
+  // Do not set `config.cache = false` in dev by default — it often causes Fast Refresh / chunk
+  // name mismatches (404 on `app/.../layout.js`, ChunkLoadError). Opt in with NEXT_DISABLE_WEBPACK_CACHE=true.
   webpack: (config, { dev }) => {
-    if (dev) {
+    if (dev && process.env.NEXT_DISABLE_WEBPACK_CACHE === "true") {
       config.cache = false;
     }
     return config;

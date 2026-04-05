@@ -4,10 +4,8 @@ import { publicAsset } from "@/lib/basePath";
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 
-const adminManifestHref = publicAsset("/admin/manifest.webmanifest");
-
 export const metadata: Metadata = {
-  manifest: adminManifestHref,
+  manifest: publicAsset("/admin/manifest.webmanifest"),
   title: {
     default: "Admin",
     template: `%s — ${BRAND_NAME} Staff`,

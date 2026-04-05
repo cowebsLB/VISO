@@ -12,9 +12,11 @@
 
 ## Corrupt or stale `.next` cache
 
-Symptoms include missing chunk errors (`Cannot find module './NNN.js'`), **`SegmentViewNode` / React Client Manifest** errors, or unexplained **500**s on admin or static routes.
+Symptoms include missing chunk errors (`Cannot find module './NNN.js'`), **`SegmentViewNode` / React Client Manifest** errors, **`ENOENT`** opening **`.next/routes-manifest.json`**, **`GET /_next/static/chunks/app/.../layout.js` 404**, **`ChunkLoadError`** after Fast Refresh, or unexplained **500**s on admin or static routes.
 
-**Fix:** Stop the dev server, then:
+**Common causes:** deleting **`.next`** or running **`npm run clean`** while **`next dev`** is still running; or running **`npm run build`** **in parallel** with **`npm run dev`** (both use **`.next`**).
+
+**Fix:** Stop the dev server (**Ctrl+C**), then:
 
 ```bash
 npm run clean
@@ -28,6 +30,10 @@ npm run clean
 Then start again with **`npm run dev`** (or **`npm run dev:clean`** for one shot).
 
 Avoid deleting **`.next`** while the dev server is still running on Windows (file locks and half-written chunks).
+
+## Webpack cache in dev
+
+**`next.config.ts`** only sets **`webpack.cache = false`** when **`NEXT_DISABLE_WEBPACK_CACHE=true`**. Keeping the default (cache on) reduces HMR / chunk name drift after edits.
 
 ## Next.js experimental devtools
 

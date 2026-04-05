@@ -17,6 +17,9 @@ for (const dir of paths) {
 
 if (!process.exitCode) {
   console.log(
-    "Next: stop any dev server on this repo, then npm run dev. If layout.css / main-app.js still 404, hard-reload once after SW purge or check NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV vs your URL.",
+    "Next: stop any dev server before clean/build. Never run `npm run build` while `npm run dev` is running — both use .next and can delete routes-manifest.json → ENOENT, 500s, and chunk 404s.",
+  );
+  console.log(
+    "Then npm run dev. If layout.css / main-app.js still 404, hard-reload once after SW purge or check NEXT_PUBLIC_FORCE_BASE_PATH_IN_DEV vs your URL.",
   );
 }
