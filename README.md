@@ -90,7 +90,7 @@ taskkill /PID <pid> /F
 
 ## PWA
 
-- Manifests: **`public/manifest.webmanifest`** (storefront) and **`public/admin/manifest.webmanifest`** (staff). Paths use **`./`** / **`../`** so they resolve correctly under **`NEXT_PUBLIC_BASE_PATH`** (e.g. GitHub Pages **`/VISO`**). There is no root **`app/manifest.ts`** — it broke the staff manifest link in prerendered admin HTML during static export.
+- Manifests: **`public/manifest.webmanifest`** (storefront, **`id`:** **`pwa-storefront`**) and **`public/admin/manifest.webmanifest`** (staff, **`id`:** **`pwa-staff`**). Distinct **`id`** values stop Chromium/Edge from treating the two PWAs as one app that “updated its name.” Paths use **`./`** / **`../`** for **`start_url`**, **`scope`**, and icons under **`NEXT_PUBLIC_BASE_PATH`**. There is no root **`app/manifest.ts`** — it broke the staff manifest link in prerendered admin HTML during static export.
 - After `npm run build`, `public/sw.js` is generated (Serwist). It is listed in `.gitignore`; regenerate on each deploy.
 
 ## Deploy

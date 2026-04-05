@@ -439,7 +439,7 @@ This document reconstructs work from **the full Cursor conversation** that built
 
 - **Symptom:** “Two PWAs” intent in code, but prerendered **`out/admin*.html`** still pointed the manifest link at the storefront **`…/manifest.webmanifest`** instead of **`…/admin/manifest.webmanifest`**.
 - **Cause:** Root **`src/app/manifest.ts`** participated in Next metadata merge such that the root manifest won during **`output: "export"`** for admin routes; nested **`app/admin/manifest.ts`** did not appear in **`out/`** as a separate route in this setup.
-- **Fix:** Delete **`src/app/manifest.ts`**; add **`public/manifest.webmanifest`** and **`public/admin/manifest.webmanifest`** with paths relative to each manifest URL (**`./`**, **`../`** for icons). **`admin/layout.tsx`** **`metadata.manifest`** → **`publicAsset("/admin/manifest.webmanifest")`**.
+- **Fix:** Delete **`src/app/manifest.ts`**; add **`public/manifest.webmanifest`** and **`public/admin/manifest.webmanifest`** with paths relative to each manifest URL (**`./`**, **`../`** for icons). **`admin/layout.tsx`** **`metadata.manifest`** → **`publicAsset("/admin/manifest.webmanifest")`**. **Follow-up:** set manifest **`id`** to **`pwa-storefront`** / **`pwa-staff`** (not **`./`** on both) so Chromium/Edge do not treat the two installs as one “branding update.”
 
 ### L.2 `metadataBase` hardening
 
