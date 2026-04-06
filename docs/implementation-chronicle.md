@@ -465,6 +465,50 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **Cause:** Default **`next export`**-style output used **`out/admin.html`**. **`start_url: "./"`** on **`public/admin/manifest.webmanifest`** resolves to a **trailing-slash** URL; static hosts treat that as **`admin/index.html`**, which did not exist.
 - **Fix:** **`trailingSlash: true`** in **`next.config.ts`** when **`output: "export"`** is active, producing **`out/admin/index.html`** (and **`out/admin/login/index.html`**, etc.). **`.github/workflows/deploy-pages.yml`** already deploys the full **`out/`** artifact — no workflow change.
 
+## Part M — Split assignments + orders modal + final handoff stabilization (6 Apr 2026)
+
+### M.1 Baker assignment view (admin-only, no schema migration)
+
+- **Goal:** Keep existing customer checkout/order pipeline unchanged, while adding internal workload split by baker.
+- **Implementation:**
+  - New page: **`src/app/admin/(shell)/assigned-orders/page.tsx`**
+  - New mapper: **`src/lib/admin/baker-assignment.ts`**
+  - Nav update: **`src/components/admin/AdminNav.tsx`**
+- **Rules (v1):**
+  - **Vicky:** `brioche/plain`, `brioche/chocolate`, `maamoul*`, `armenian-gata`
+  - **Sonig:** all remaining items
+- **Design choice:** assignments are **derived** from `orders` + `order_items` (no extra table), minimizing production risk and preserving current source-of-truth model.
+
+### M.2 Orders details UX: inline panel -> modal
+
+- **Problem:** Details required scrolling to page bottom in a long list.
+- **Change:** Converted details into a modal on **`/admin/orders`** with:
+  - current order metadata,
+  - line items,
+  - existing status actions (`confirm_order`, `update_order_status` pathing unchanged),
+  - close controls: button, backdrop click, Esc key.
+
+### M.3 Runtime failures during handoff and recovery
+
+- **Observed errors:**
+  - `_next/static/...` 404 (`layout.css`, `main-app.js`, chunk files)
+  - `GET /` and `GET /admin/orders` -> **500**
+  - server trace: **`ENOENT ... .next/routes-manifest.json`**
+  - restart blocker: **`EADDRINUSE: 3040`** from stale `node.exe`
+- **Root causes:** dev/build cache corruption and stale process ownership of 3040.
+- **Recovery playbook executed:**
+  - stop dev process,
+  - run **`npm run clean`** (remove `.next` + `node_modules/.cache`),
+  - kill stale PID from `netstat -ano | rg :3040`,
+  - restart `npm run dev`,
+  - verify `/` and `/admin/orders` return **200**.
+
+### M.4 Validation snapshot
+
+- **Build:** `npm run build` passed after each substantial change.
+- **Lint:** `npm run lint` passed; one pre-existing warning in recipes hook deps.
+- **Route checks:** local HTTP checks confirmed root/admin recovery after manifest corruption.
+
 ---
 
 ## Revision
@@ -476,5 +520,6 @@ This document reconstructs work from **the full Cursor conversation** that built
 - **v5:** Part K (admin Web Push + Supabase automation + dashboard path).
 - **v6:** Part L (5 Apr 2026 split PWA manifests, preview script, dev webpack / `.next` hygiene).
 - **v7:** Part **L.6** (same day): static export **`trailingSlash`** for **`admin/index.html`** on GitHub Pages / staff PWA **`start_url`**.
+- **v8:** Part M (6 Apr 2026): baker split panel, orders modal UX, dev 500/manifest recovery, and final handoff validation.
 
 *Compiled from session transcript and repo state — April 2026.*

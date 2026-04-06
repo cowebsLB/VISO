@@ -157,6 +157,17 @@ export default function AdminOrdersPage() {
     [orders, selectedId],
   );
 
+  useEffect(() => {
+    if (!selectedId) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setSelectedId(null);
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedId]);
+
   async function refresh() {
     setLoading(true);
     await loadOrders();
@@ -501,48 +512,81 @@ export default function AdminOrdersPage() {
       </section>
 
       {selected && (
-        <section
-          className="rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200"
-          data-testid="order-detail"
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Order ${selected.id} details`}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedId(null);
+            }
+          }}
         >
-          <h3 className="font-semibold text-primary-800">Order {selected.id}</h3>
-          <p className="mt-2 text-sm text-slate-600">
-            Inventory applied: {selected.inventory_applied_at ? "yes" : "no"}
-          </p>
-          <ul className="mt-4 list-inside list-disc space-y-1 text-sm">
-            {(itemsByOrder[selected.id] ?? []).map((it) => (
-              <li key={it.id}>
-                {it.title_snapshot} × {it.qty} @ ${Number(it.unit_price).toFixed(2)}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {allowedNextStatuses(selected.status).map((next) => {
-              if (mustUseConfirmOrder(selected.status, next)) {
+          <section
+            className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-card ring-1 ring-slate-200"
+            data-testid="order-detail"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="font-semibold text-primary-800">Order {selected.id}</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  {selected.customer_name} · {selected.phone}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  {new Date(selected.created_at).toLocaleString()} ·{" "}
+                  {selected.status.replaceAll("_", " ")} · {selected.source}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="rounded-full border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                onClick={() => setSelectedId(null)}
+              >
+                Close
+              </button>
+            </div>
+
+            <p className="mt-3 text-sm text-slate-600">
+              Inventory applied: {selected.inventory_applied_at ? "yes" : "no"}
+            </p>
+
+            <ul className="mt-4 list-inside list-disc space-y-1 text-sm">
+              {(itemsByOrder[selected.id] ?? []).map((it) => (
+                <li key={it.id}>
+                  {it.title_snapshot} × {it.qty} @ ${Number(it.unit_price).toFixed(2)}
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-6 flex flex-wrap gap-2">
+              {allowedNextStatuses(selected.status).map((next) => {
+                if (mustUseConfirmOrder(selected.status, next)) {
+                  return (
+                    <button
+                      key={next}
+                      type="button"
+                      className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
+                      onClick={() => void confirmOrder(selected.id)}
+                    >
+                      Confirm (deduct stock)
+                    </button>
+                  );
+                }
                 return (
                   <button
                     key={next}
                     type="button"
-                    className="rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white"
-                    onClick={() => void confirmOrder(selected.id)}
+                    className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold"
+                    onClick={() => void setStatus(selected.id, next)}
                   >
-                    Confirm (deduct stock)
+                    Mark {next.replace("_", " ")}
                   </button>
                 );
-              }
-              return (
-                <button
-                  key={next}
-                  type="button"
-                  className="rounded-full border border-slate-300 px-4 py-2 text-sm font-semibold"
-                  onClick={() => void setStatus(selected.id, next)}
-                >
-                  Mark {next.replace("_", " ")}
-                </button>
-              );
-            })}
-          </div>
-        </section>
+              })}
+            </div>
+          </section>
+        </div>
       )}
     </div>
   );

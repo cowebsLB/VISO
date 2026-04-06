@@ -34,6 +34,7 @@ Technical reference for the **Anush Badar** bakery site: Next.js storefront, Sup
 | [Worklog-03-04-2026.md](./Worklog-03-04-2026.md) | Daily worklog: Anush Badar branding, PWA/dev cache, staff notifs, orders cards (3 Apr 2026) |
 | [Worklog-04-04-2026.md](./Worklog-04-04-2026.md) | Web Push + Supabase setup script, docs, dev/export and `siteUrl` fixes (4 Apr 2026) |
 | [Worklog-05-04-2026.md](./Worklog-05-04-2026.md) | Split PWA manifests (static JSON), `metadataBaseUrl`, `npm run preview`, dev webpack / `.next` notes, GitHub Pages **`/admin/`** export + **`trailingSlash`** (5 Apr 2026) |
+| [Worklog-06-04-2026.md](./Worklog-06-04-2026.md) | Handoff round: baker split (`Assigned Orders`), order-details modal UX, dev 500/manifest recovery playbook, final validation (6 Apr 2026) |
 
 ## Database and migrations
 
